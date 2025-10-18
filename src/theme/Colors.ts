@@ -3,7 +3,7 @@ export const Colors = {
     // Primary brand colors (Material Design Blue)
     primary: '#1976D2', // Material Design Blue 700
     primaryDark: '#1565C0', // Material Design Blue 800
-    primaryLight: '#42A5F5', // Material Design Blue 400
+    primaryLight: '#8ec7f5ff', // Material Design Blue 400
 
     // Secondary / Accent colors
     secondary: '#1A73E8', // Google Blue

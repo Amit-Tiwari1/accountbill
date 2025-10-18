@@ -6,6 +6,7 @@ export interface AppTheme {
         onPrimary: string;
         secondary: string;
         background: string;
+        lightBackground: string;
         surface: string;
         onSurface: string;
         error: string;
@@ -25,7 +26,7 @@ export const LightTheme: AppTheme = {
     roundness: 12,
     colors: {
         primary: Colors.primary,
-        onPrimary: '#FFFFFF',
+        onPrimary: '#D3D3D3',
         secondary: Colors.secondary,
         background: '#FFFFFF',
         surface: '#FFFFFF',
@@ -39,6 +40,7 @@ export const LightTheme: AppTheme = {
         errorContainer: Colors.error,
         onErrorContainer: '#FFFFFF',
         surfaceVariant: Colors.surface,
+        lightBackground: Colors.primaryLight
     },
 };
 
@@ -60,5 +62,6 @@ export const DarkTheme: AppTheme = {
         errorContainer: Colors.error,
         onErrorContainer: '#FFFFFF',
         surfaceVariant: Colors.dark.surface,
+        lightBackground: Colors.primaryLight
     },
 };

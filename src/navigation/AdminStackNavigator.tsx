@@ -1,66 +1,105 @@
+// src/navigation/AdminTabNavigator.tsx
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from '../screens/AdminStack/HomeScreen';
-import AddTransactionScreen from '../screens/AdminStack/AddTransactionScreen';
-import TransactionsScreen from '../screens/AdminStack/TransactionsScreen';
-import ReportsScreen from '../screens/AdminStack/ReportsScreen';
-import ProfileScreen from '../screens/AdminStack/ProfileScreen';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View } from 'react-native';
+import { MaterialIcons } from '@react-native-vector-icons/material-icons';
+import { useTheme } from '../theme/ThemeContext';
+
+// Import screens
+import ExpenseScreen from '../screens/AdminStack/ExpenseScreen';
+import BillsScreen from '../screens/AdminStack/BillsScreen';
+import PartiesScreen from '../screens/AdminStack/PartiesScreen';
+import ProductsScreen from '../screens/AdminStack/ProductsScreen';
+import SettingsScreen from '../screens/AdminStack/SettingsScreen';
 
 export type AdminStackParamList = {
-  HomeScreen: undefined;
-  AddTransaction: undefined;
-  Transactions: undefined;
-  Reports: undefined;
-  Profile: undefined;
+  Bills: undefined;
+  Parties: undefined;
+  Products: undefined;
+  Settings: undefined;
+  Expense: undefined;
 };
 
-const AdminStack = createStackNavigator<AdminStackParamList>();
+const Tab = createBottomTabNavigator<AdminStackParamList>();
 
-const AdminStackNavigator = () => {
+const screens = [
+  { name: 'Expense', component: ExpenseScreen, label: 'Home', icon: 'home', rounded: false },
+  { name: 'Parties', component: PartiesScreen, label: 'Parties', icon: 'people', rounded: false },
+  { name: 'Bills', component: BillsScreen, label: 'Bills', icon: 'description', rounded: true },
+  { name: 'Products', component: ProductsScreen, label: 'Products', icon: 'inventory', rounded: false },
+  { name: 'Settings', component: SettingsScreen, label: 'More', icon: 'more-horiz', rounded: false },
+];
+
+const AdminTabNavigator = () => {
+  const theme = useTheme();
+
   return (
-    <AdminStack.Navigator
+    <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        cardStyle: { backgroundColor: '#f5f5f5' },
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: theme.colors.background,
+          height: 60,
+          paddingBottom: 5,
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          elevation: 0,
+          shadowOpacity: 0,
+        },
       }}
     >
-      <AdminStack.Screen
-        name="HomeScreen"
-        component={HomeScreen}
-        options={{
-          title: 'Home',
-        }}
-      />
-      <AdminStack.Screen
-        name="AddTransaction"
-        component={AddTransactionScreen}
-        options={{
-          title: 'Add Transaction',
-        }}
-      />
-      <AdminStack.Screen
-        name="Transactions"
-        component={TransactionsScreen}
-        options={{
-          title: 'Transactions',
-        }}
-      />
-      <AdminStack.Screen
-        name="Reports"
-        component={ReportsScreen}
-        options={{
-          title: 'Reports',
-        }}
-      />
-      <AdminStack.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          title: 'Profile',
-        }}
-      />
-    </AdminStack.Navigator>
+      {screens.map((screen) => (
+        <Tab.Screen
+          key={screen.name}
+          name={screen.name as keyof AdminStackParamList}
+          component={screen.component}
+          options={{
+            tabBarLabel: screen.label,
+            tabBarIcon: ({ color, size, focused }) => (
+              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                {/* Active line on top */}
+                {focused && (
+                  <View
+                    style={{
+                      width: 24,
+                      height: 3,
+                      backgroundColor: theme.colors.primary,
+                      borderRadius: 2,
+                      marginBottom: 4,
+                    }}
+                  />
+                )}
+
+                {/* Optional rounded background */}
+                {screen.rounded ? (
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      backgroundColor: theme.colors.surface,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <MaterialIcons name={screen.icon as any} size={24} color={color} />
+                  </View>
+                ) : (
+                  <MaterialIcons name={screen.icon as any} size={24} color={color} />
+                )}
+              </View>
+            ),
+          }}
+        />
+      ))}
+    </Tab.Navigator>
   );
 };
 
-export default AdminStackNavigator;
+export default AdminTabNavigator;

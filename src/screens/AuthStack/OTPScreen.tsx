@@ -92,7 +92,8 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ navigation, route }) => {
         if (code.length !== 6) return showMessage('Enter a valid 6-digit OTP', 'error');
 
         showMessage('OTP Verified!', 'success');
-        navigation.replace('Home');
+        navigation.replace('AdminStack', { screen: 'HomeScreen' });
+
     };
 
     return (
