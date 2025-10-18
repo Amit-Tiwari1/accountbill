@@ -2,7 +2,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View } from 'react-native';
-import { MaterialIcons } from '@react-native-vector-icons/material-icons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Correct import for RN CLI
 import { useTheme } from '../theme/ThemeContext';
 
 // Import screens
@@ -88,10 +88,10 @@ const AdminTabNavigator = () => {
                       alignItems: 'center',
                     }}
                   >
-                    <MaterialIcons name={screen.icon as any} size={24} color={color} />
+                    <MaterialIcons name={screen.icon} size={24} color={color} />
                   </View>
                 ) : (
-                  <MaterialIcons name={screen.icon as any} size={24} color={color} />
+                  <MaterialIcons name={screen.icon} size={24} color={color} />
                 )}
               </View>
             ),

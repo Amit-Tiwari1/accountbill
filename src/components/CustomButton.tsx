@@ -24,7 +24,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         <TouchableOpacity
             style={[
                 styles.button,
-                { backgroundColor: backgroundColor || theme.colors.lightBackground },
+                { backgroundColor: backgroundColor || theme.colors.primary },
                 style,
             ]}
             onPress={onPress}

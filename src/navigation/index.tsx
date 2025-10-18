@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import SplashScreen from '../screens/SplashScreen';
 import AuthStackNavigator from './AuthStackNavigator';
 import AdminStackNavigator from './AdminStackNavigator';
+// Removed AdminDrawerNavigator to avoid Reanimated dependency
 
 export type RootStackParamList = {
   SplashScreen: undefined;
@@ -44,6 +45,7 @@ const RootNavigator = () => {
           title: 'Admin',
         }}
       />
+
     </RootStack.Navigator>
   );
 };
