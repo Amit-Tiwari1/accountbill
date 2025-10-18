@@ -1,17 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { 
-  Card, 
-  Title, 
-  Paragraph,
-  Text,
-  Button,
-  TextInput,
-  Avatar,
-  List,
-  Switch,
-  Divider
-} from 'react-native-paper';
+import { View, StyleSheet, ScrollView, Alert, Text, TextInput, TouchableOpacity, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface ProfileScreenProps {
@@ -37,8 +25,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       'Are you sure you want to logout?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Logout', 
+        {
+          text: 'Logout',
           style: 'destructive',
           onPress: () => navigation.replace('AuthStack')
         }
@@ -52,8 +40,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       'This action cannot be undone. Are you sure you want to delete your account?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
+        {
+          text: 'Delete',
           style: 'destructive',
           onPress: () => {
             Alert.alert('Account Deleted', 'Your account has been deleted.');
@@ -69,26 +57,29 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           {/* Profile Header */}
-          <Card style={styles.profileCard}>
-            <Card.Content style={styles.profileContent}>
-              <Avatar.Text size={80} label="JD" style={styles.avatar} />
-              <Title style={styles.profileName}>{name}</Title>
-              <Paragraph style={styles.profileEmail}>{email}</Paragraph>
-              <Button
-                mode="outlined"
+          <View style={styles.profileCard}>
+            <View style={styles.profileContent}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>JD</Text>
+              </View>
+              <Text style={styles.profileName}>{name}</Text>
+              <Text style={styles.profileEmail}>{email}</Text>
+              <TouchableOpacity
                 onPress={() => setIsEditing(!isEditing)}
                 style={styles.editButton}
               >
-                {isEditing ? 'Cancel' : 'Edit Profile'}
-              </Button>
-            </Card.Content>
-          </Card>
+                <Text style={styles.editButtonText}>
+                  {isEditing ? 'Cancel' : 'Edit Profile'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Profile Information */}
-          <Card style={styles.infoCard}>
-            <Card.Content>
-              <Title>Personal Information</Title>
-              
+          <View style={styles.infoCard}>
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Personal Information</Text>
+
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Full Name</Text>
                 {isEditing ? (
@@ -96,10 +87,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     value={name}
                     onChangeText={setName}
                     style={styles.input}
-                    mode="outlined"
                   />
                 ) : (
-                  <Text variant="bodyLarge" style={styles.infoText}>{name}</Text>
+                  <Text style={styles.infoText}>{name}</Text>
                 )}
               </View>
 
@@ -110,11 +100,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     value={email}
                     onChangeText={setEmail}
                     style={styles.input}
-                    mode="outlined"
                     keyboardType="email-address"
                   />
                 ) : (
-                  <Text variant="bodyLarge" style={styles.infoText}>{email}</Text>
+                  <Text style={styles.infoText}>{email}</Text>
                 )}
               </View>
 
@@ -125,116 +114,110 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                     value={phone}
                     onChangeText={setPhone}
                     style={styles.input}
-                    mode="outlined"
                     keyboardType="phone-pad"
                   />
                 ) : (
-                  <Text variant="bodyLarge" style={styles.infoText}>{phone}</Text>
+                  <Text style={styles.infoText}>{phone}</Text>
                 )}
               </View>
 
               {isEditing && (
-                <Button
-                  mode="contained"
+                <TouchableOpacity
                   onPress={handleSaveProfile}
                   style={styles.saveButton}
                 >
-                  Save Changes
-                </Button>
+                  <Text style={styles.saveButtonText}>Save Changes</Text>
+                </TouchableOpacity>
               )}
-            </Card.Content>
-          </Card>
+            </View>
+          </View>
 
           {/* Settings */}
-          <Card style={styles.settingsCard}>
-            <Card.Content>
-              <Title>Settings</Title>
-              
-              <List.Item
-                title="Push Notifications"
-                description="Receive notifications for transactions and updates"
-                right={() => (
-                  <Switch
-                    value={notificationsEnabled}
-                    onValueChange={setNotificationsEnabled}
-                  />
-                )}
-              />
-              
-              <Divider />
-              
-              <List.Item
-                title="Dark Mode"
-                description="Switch to dark theme"
-                right={() => (
-                  <Switch
-                    value={darkModeEnabled}
-                    onValueChange={setDarkModeEnabled}
-                  />
-                )}
-              />
-            </Card.Content>
-          </Card>
+          <View style={styles.settingsCard}>
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Settings</Text>
+
+              <View style={styles.settingItem}>
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingTitle}>Push Notifications</Text>
+                  <Text style={styles.settingDescription}>Receive notifications for transactions and updates</Text>
+                </View>
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={setNotificationsEnabled}
+                />
+              </View>
+
+              <View style={styles.divider} />
+
+              <View style={styles.settingItem}>
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingTitle}>Dark Mode</Text>
+                  <Text style={styles.settingDescription}>Switch to dark theme</Text>
+                </View>
+                <Switch
+                  value={darkModeEnabled}
+                  onValueChange={setDarkModeEnabled}
+                />
+              </View>
+            </View>
+          </View>
 
           {/* Account Actions */}
-          <Card style={styles.actionsCard}>
-            <Card.Content>
-              <Title>Account Actions</Title>
-              
-              <List.Item
-                title="Change Password"
-                description="Update your account password"
-                left={(props) => <List.Icon {...props} icon="lock" />}
-                right={(props) => <List.Icon {...props} icon="chevron-right" />}
+          <View style={styles.actionsCard}>
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Account Actions</Text>
+
+              <TouchableOpacity
+                style={styles.actionItem}
                 onPress={() => Alert.alert('Change Password', 'Password change feature coming soon!')}
-              />
-              
-              <Divider />
-              
-              <List.Item
-                title="Export Data"
-                description="Download your transaction data"
-                left={(props) => <List.Icon {...props} icon="download" />}
-                right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              >
+                <Text style={styles.actionTitle}>Change Password</Text>
+                <Text style={styles.actionDescription}>Update your account password</Text>
+              </TouchableOpacity>
+
+              <View style={styles.divider} />
+
+              <TouchableOpacity
+                style={styles.actionItem}
                 onPress={() => Alert.alert('Export Data', 'Data export feature coming soon!')}
-              />
-              
-              <Divider />
-              
-              <List.Item
-                title="Privacy Policy"
-                description="View our privacy policy"
-                left={(props) => <List.Icon {...props} icon="shield-account" />}
-                right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              >
+                <Text style={styles.actionTitle}>Export Data</Text>
+                <Text style={styles.actionDescription}>Download your transaction data</Text>
+              </TouchableOpacity>
+
+              <View style={styles.divider} />
+
+              <TouchableOpacity
+                style={styles.actionItem}
                 onPress={() => Alert.alert('Privacy Policy', 'Privacy policy feature coming soon!')}
-              />
-            </Card.Content>
-          </Card>
+              >
+                <Text style={styles.actionTitle}>Privacy Policy</Text>
+                <Text style={styles.actionDescription}>View our privacy policy</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Danger Zone */}
-          <Card style={styles.dangerCard}>
-            <Card.Content>
-              <Title style={styles.dangerTitle}>Danger Zone</Title>
-              
-              <Button
-                mode="outlined"
+          <View style={styles.dangerCard}>
+            <View style={styles.cardContent}>
+              <Text style={styles.dangerTitle}>Danger Zone</Text>
+
+              <TouchableOpacity
                 onPress={handleLogout}
                 style={styles.logoutButton}
-                textColor="#F44336"
               >
-                Logout
-              </Button>
-              
-              <Button
-                mode="outlined"
+                <Text style={styles.dangerButtonText}>Logout</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
                 onPress={handleDeleteAccount}
                 style={styles.deleteButton}
-                textColor="#F44336"
               >
-                Delete Account
-              </Button>
-            </Card.Content>
-          </Card>
+                <Text style={styles.dangerButtonText}>Delete Account</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -255,28 +238,64 @@ const styles = StyleSheet.create({
   profileCard: {
     marginBottom: 20,
     elevation: 2,
+    backgroundColor: 'white',
+    borderRadius: 8,
   },
   profileContent: {
     alignItems: 'center',
     paddingVertical: 20,
   },
   avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: '#6200ee',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 15,
   },
+  avatarText: {
+    color: 'white',
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
   profileName: {
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 5,
   },
   profileEmail: {
     color: '#666',
     marginBottom: 15,
+    fontSize: 16,
   },
   editButton: {
     marginTop: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#6200ee',
+    backgroundColor: 'transparent',
+  },
+  editButtonText: {
+    color: '#6200ee',
+    fontSize: 16,
+    fontWeight: '600',
   },
   infoCard: {
     marginBottom: 20,
     elevation: 2,
+    backgroundColor: 'white',
+    borderRadius: 8,
+  },
+  cardContent: {
+    padding: 16,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
   },
   inputContainer: {
     marginVertical: 10,
@@ -285,39 +304,120 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
     color: '#333',
+    fontWeight: '600',
   },
   input: {
     marginBottom: 5,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
   },
   infoText: {
     paddingVertical: 8,
     color: '#333',
+    fontSize: 16,
   },
   saveButton: {
     marginTop: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    backgroundColor: '#6200ee',
+    alignItems: 'center',
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   settingsCard: {
     marginBottom: 20,
     elevation: 2,
+    backgroundColor: 'white',
+    borderRadius: 8,
+  },
+  settingItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  settingInfo: {
+    flex: 1,
+  },
+  settingTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  settingDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 8,
   },
   actionsCard: {
     marginBottom: 20,
     elevation: 2,
+    backgroundColor: 'white',
+    borderRadius: 8,
+  },
+  actionItem: {
+    paddingVertical: 12,
+  },
+  actionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  actionDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
   },
   dangerCard: {
     marginBottom: 20,
     elevation: 2,
+    backgroundColor: 'white',
+    borderRadius: 8,
   },
   dangerTitle: {
     color: '#F44336',
     marginBottom: 15,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   logoutButton: {
     marginBottom: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1,
     borderColor: '#F44336',
+    backgroundColor: 'transparent',
+    alignItems: 'center',
   },
   deleteButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1,
     borderColor: '#F44336',
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+  },
+  dangerButtonText: {
+    color: '#F44336',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

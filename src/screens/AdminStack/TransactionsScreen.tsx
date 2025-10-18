@@ -1,15 +1,7 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { 
-  Card, 
-  Title, 
-  Paragraph,
-  Text,
-  FAB,
-  Chip,
-  Searchbar
-} from 'react-native-paper';
+import { View, StyleSheet, FlatList, Text, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialIcons } from '@react-native-vector-icons/material-icons';
 
 interface Transaction {
   id: string;
@@ -58,79 +50,97 @@ const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ navigation }) =
 
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         transaction.category.toLowerCase().includes(searchQuery.toLowerCase());
+      transaction.category.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = filterType === 'all' || transaction.type === filterType;
     return matchesSearch && matchesFilter;
   });
 
   const renderTransaction = ({ item }: { item: Transaction }) => (
-    <Card style={styles.transactionCard}>
-      <Card.Content>
+    <View style={styles.transactionCard}>
+      <View style={styles.transactionContent}>
         <View style={styles.transactionHeader}>
           <View style={styles.transactionInfo}>
-            <Text variant="titleMedium">{item.description}</Text>
-            <Text variant="bodySmall" style={styles.category}>{item.category}</Text>
-            <Text variant="bodySmall" style={styles.date}>{item.date}</Text>
+            <Text style={styles.transactionDescription}>{item.description}</Text>
+            <Text style={styles.category}>{item.category}</Text>
+            <Text style={styles.date}>{item.date}</Text>
           </View>
           <View style={styles.amountContainer}>
-            <Text 
-              variant="titleLarge" 
+            <Text
               style={[
-                styles.amount, 
+                styles.amount,
                 { color: item.type === 'income' ? '#4CAF50' : '#F44336' }
               ]}
             >
               {item.type === 'income' ? '+' : '-'}${item.amount.toFixed(2)}
             </Text>
-            <Chip 
-              mode="outlined" 
-              compact
+            <View
               style={[
                 styles.typeChip,
                 { backgroundColor: item.type === 'income' ? '#E8F5E8' : '#FFEBEE' }
               ]}
             >
-              {item.type}
-            </Chip>
+              <Text style={styles.typeChipText}>{item.type}</Text>
+            </View>
           </View>
         </View>
-      </Card.Content>
-    </Card>
+      </View>
+    </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Title>Transactions</Title>
-        <Searchbar
+        <Text style={styles.headerTitle}>Transactions</Text>
+        <TextInput
           placeholder="Search transactions..."
           onChangeText={setSearchQuery}
           value={searchQuery}
           style={styles.searchbar}
         />
-        
+
         <View style={styles.filterContainer}>
-          <Chip
-            selected={filterType === 'all'}
+          <TouchableOpacity
+            style={[
+              styles.filterChip,
+              filterType === 'all' && styles.filterChipSelected
+            ]}
             onPress={() => setFilterType('all')}
-            style={styles.filterChip}
           >
-            All
-          </Chip>
-          <Chip
-            selected={filterType === 'income'}
+            <Text style={[
+              styles.filterChipText,
+              filterType === 'all' && styles.filterChipTextSelected
+            ]}>
+              All
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.filterChip,
+              filterType === 'income' && styles.filterChipSelected
+            ]}
             onPress={() => setFilterType('income')}
-            style={styles.filterChip}
           >
-            Income
-          </Chip>
-          <Chip
-            selected={filterType === 'expense'}
+            <Text style={[
+              styles.filterChipText,
+              filterType === 'income' && styles.filterChipTextSelected
+            ]}>
+              Income
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.filterChip,
+              filterType === 'expense' && styles.filterChipSelected
+            ]}
             onPress={() => setFilterType('expense')}
-            style={styles.filterChip}
           >
-            Expense
-          </Chip>
+            <Text style={[
+              styles.filterChipText,
+              filterType === 'expense' && styles.filterChipTextSelected
+            ]}>
+              Expense
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -142,22 +152,23 @@ const TransactionsScreen: React.FC<TransactionsScreenProps> = ({ navigation }) =
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text variant="bodyLarge" style={styles.emptyText}>
+            <Text style={styles.emptyText}>
               No transactions found
             </Text>
-            <Paragraph style={styles.emptySubtext}>
+            <Text style={styles.emptySubtext}>
               Add your first transaction to get started
-            </Paragraph>
+            </Text>
           </View>
         }
       />
 
-      <FAB
+      <TouchableOpacity
         style={styles.fab}
-        icon="plus"
         onPress={() => navigation.navigate('AddTransaction')}
-        label="Add Transaction"
-      />
+      >
+        <MaterialIcons name="add" size={24} color="white" />
+        <Text style={styles.fabLabel}>Add Transaction</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -172,8 +183,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     elevation: 2,
   },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
   searchbar: {
     marginVertical: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: 'white',
+    fontSize: 16,
   },
   filterContainer: {
     flexDirection: 'row',
@@ -181,6 +204,24 @@ const styles = StyleSheet.create({
   },
   filterChip: {
     marginRight: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  filterChipSelected: {
+    backgroundColor: '#6200ee',
+    borderColor: '#6200ee',
+  },
+  filterChipText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '600',
+  },
+  filterChipTextSelected: {
+    color: 'white',
   },
   listContainer: {
     padding: 20,
@@ -188,6 +229,11 @@ const styles = StyleSheet.create({
   transactionCard: {
     marginBottom: 10,
     elevation: 2,
+    backgroundColor: 'white',
+    borderRadius: 8,
+  },
+  transactionContent: {
+    padding: 16,
   },
   transactionHeader: {
     flexDirection: 'row',
@@ -197,22 +243,38 @@ const styles = StyleSheet.create({
   transactionInfo: {
     flex: 1,
   },
+  transactionDescription: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
   category: {
     color: '#666',
     marginTop: 2,
+    fontSize: 14,
   },
   date: {
     color: '#999',
     marginTop: 2,
+    fontSize: 12,
   },
   amountContainer: {
     alignItems: 'flex-end',
   },
   amount: {
     fontWeight: 'bold',
+    fontSize: 18,
   },
   typeChip: {
     marginTop: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  typeChipText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#666',
   },
   emptyContainer: {
     alignItems: 'center',
@@ -221,16 +283,31 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#666',
     marginBottom: 10,
+    fontSize: 16,
   },
   emptySubtext: {
     color: '#999',
     textAlign: 'center',
+    fontSize: 14,
   },
   fab: {
     position: 'absolute',
     margin: 16,
     right: 0,
     bottom: 0,
+    backgroundColor: '#6200ee',
+    borderRadius: 28,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 4,
+  },
+  fabLabel: {
+    color: 'white',
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

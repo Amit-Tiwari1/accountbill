@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
-import { 
-  Card, 
-  Title, 
-  Paragraph,
-  Text,
-  SegmentedButtons,
-  ProgressBar
-} from 'react-native-paper';
+import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface ReportsScreenProps {
@@ -38,123 +30,162 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ navigation }) => {
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
           <View style={styles.header}>
-            <Title>Financial Reports</Title>
-            <SegmentedButtons
-              value={selectedPeriod}
-              onValueChange={setSelectedPeriod}
-              buttons={[
-                { value: 'week', label: 'Week' },
-                { value: 'month', label: 'Month' },
-                { value: 'year', label: 'Year' },
-              ]}
-              style={styles.segmentedButtons}
-            />
+            <Text style={styles.headerTitle}>Financial Reports</Text>
+            <View style={styles.segmentedButtons}>
+              <TouchableOpacity
+                style={[
+                  styles.segmentButton,
+                  selectedPeriod === 'week' && styles.segmentButtonActive
+                ]}
+                onPress={() => setSelectedPeriod('week')}
+              >
+                <Text style={[
+                  styles.segmentButtonText,
+                  selectedPeriod === 'week' && styles.segmentButtonTextActive
+                ]}>
+                  Week
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.segmentButton,
+                  selectedPeriod === 'month' && styles.segmentButtonActive
+                ]}
+                onPress={() => setSelectedPeriod('month')}
+              >
+                <Text style={[
+                  styles.segmentButtonText,
+                  selectedPeriod === 'month' && styles.segmentButtonTextActive
+                ]}>
+                  Month
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.segmentButton,
+                  selectedPeriod === 'year' && styles.segmentButtonActive
+                ]}
+                onPress={() => setSelectedPeriod('year')}
+              >
+                <Text style={[
+                  styles.segmentButtonText,
+                  selectedPeriod === 'year' && styles.segmentButtonTextActive
+                ]}>
+                  Year
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Summary Cards */}
-          <Card style={styles.summaryCard}>
-            <Card.Content>
-              <Title>Monthly Summary</Title>
+          <View style={styles.summaryCard}>
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Monthly Summary</Text>
               <View style={styles.summaryRow}>
                 <View style={styles.summaryItem}>
-                  <Text variant="bodyLarge" style={styles.summaryLabel}>Total Income</Text>
-                  <Text variant="headlineSmall" style={styles.incomeAmount}>
+                  <Text style={styles.summaryLabel}>Total Income</Text>
+                  <Text style={styles.incomeAmount}>
                     ${monthlyData.totalIncome.toLocaleString()}
                   </Text>
                 </View>
                 <View style={styles.summaryItem}>
-                  <Text variant="bodyLarge" style={styles.summaryLabel}>Total Expenses</Text>
-                  <Text variant="headlineSmall" style={styles.expenseAmount}>
+                  <Text style={styles.summaryLabel}>Total Expenses</Text>
+                  <Text style={styles.expenseAmount}>
                     ${monthlyData.totalExpenses.toLocaleString()}
                   </Text>
                 </View>
               </View>
               <View style={styles.netIncomeContainer}>
-                <Text variant="bodyLarge" style={styles.summaryLabel}>Net Income</Text>
-                <Text 
-                  variant="headlineMedium" 
+                <Text style={styles.summaryLabel}>Net Income</Text>
+                <Text
                   style={[
-                    styles.netAmount, 
+                    styles.netAmount,
                     { color: netIncome >= 0 ? '#4CAF50' : '#F44336' }
                   ]}
                 >
                   ${netIncome.toLocaleString()}
                 </Text>
               </View>
-            </Card.Content>
-          </Card>
+            </View>
+          </View>
 
           {/* Expense Categories */}
-          <Card style={styles.categoriesCard}>
-            <Card.Content>
-              <Title>Expense Categories</Title>
+          <View style={styles.categoriesCard}>
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Expense Categories</Text>
               {monthlyData.categories.map((category, index) => (
                 <View key={index} style={styles.categoryItem}>
                   <View style={styles.categoryHeader}>
-                    <Text variant="bodyLarge">{category.name}</Text>
-                    <Text variant="bodyLarge" style={styles.categoryAmount}>
+                    <Text style={styles.categoryName}>{category.name}</Text>
+                    <Text style={styles.categoryAmount}>
                       ${category.amount}
                     </Text>
                   </View>
                   <View style={styles.progressContainer}>
-                    <ProgressBar 
-                      progress={category.percentage / 100} 
-                      style={styles.progressBar}
-                      color="#6200ee"
-                    />
-                    <Text variant="bodySmall" style={styles.percentage}>
+                    <View style={styles.progressBarBackground}>
+                      <View
+                        style={[
+                          styles.progressBarFill,
+                          { width: `${category.percentage}%` }
+                        ]}
+                      />
+                    </View>
+                    <Text style={styles.percentage}>
                       {category.percentage.toFixed(1)}%
                     </Text>
                   </View>
                 </View>
               ))}
-            </Card.Content>
-          </Card>
+            </View>
+          </View>
 
           {/* Budget vs Actual */}
-          <Card style={styles.budgetCard}>
-            <Card.Content>
-              <Title>Budget vs Actual</Title>
+          <View style={styles.budgetCard}>
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Budget vs Actual</Text>
               <View style={styles.budgetItem}>
-                <Text variant="bodyLarge">Monthly Budget</Text>
-                <Text variant="bodyLarge" style={styles.budgetAmount}>$3,500</Text>
+                <Text style={styles.budgetLabel}>Monthly Budget</Text>
+                <Text style={styles.budgetAmount}>$3,500</Text>
               </View>
               <View style={styles.budgetItem}>
-                <Text variant="bodyLarge">Actual Spending</Text>
-                <Text variant="bodyLarge" style={styles.actualAmount}>$3,200</Text>
+                <Text style={styles.budgetLabel}>Actual Spending</Text>
+                <Text style={styles.actualAmount}>$3,200</Text>
               </View>
               <View style={styles.budgetItem}>
-                <Text variant="bodyLarge">Remaining</Text>
-                <Text variant="bodyLarge" style={styles.remainingAmount}>$300</Text>
+                <Text style={styles.budgetLabel}>Remaining</Text>
+                <Text style={styles.remainingAmount}>$300</Text>
               </View>
-              <ProgressBar 
-                progress={monthlyData.totalExpenses / 3500} 
-                style={styles.budgetProgress}
-                color="#4CAF50"
-              />
-            </Card.Content>
-          </Card>
+              <View style={styles.budgetProgressBackground}>
+                <View
+                  style={[
+                    styles.budgetProgressFill,
+                    { width: `${(monthlyData.totalExpenses / 3500) * 100}%` }
+                  ]}
+                />
+              </View>
+            </View>
+          </View>
 
           {/* Trends */}
-          <Card style={styles.trendsCard}>
-            <Card.Content>
-              <Title>Spending Trends</Title>
-              <Paragraph style={styles.trendText}>
-                Your spending has decreased by 5% compared to last month. 
+          <View style={styles.trendsCard}>
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Spending Trends</Text>
+              <Text style={styles.trendText}>
+                Your spending has decreased by 5% compared to last month.
                 Great job on managing your expenses!
-              </Paragraph>
+              </Text>
               <View style={styles.trendStats}>
                 <View style={styles.trendItem}>
-                  <Text variant="bodyLarge" style={styles.trendLabel}>This Month</Text>
-                  <Text variant="headlineSmall" style={styles.trendValue}>$3,200</Text>
+                  <Text style={styles.trendLabel}>This Month</Text>
+                  <Text style={styles.trendValue}>$3,200</Text>
                 </View>
                 <View style={styles.trendItem}>
-                  <Text variant="bodyLarge" style={styles.trendLabel}>Last Month</Text>
-                  <Text variant="headlineSmall" style={styles.trendValue}>$3,370</Text>
+                  <Text style={styles.trendLabel}>Last Month</Text>
+                  <Text style={styles.trendValue}>$3,370</Text>
                 </View>
               </View>
-            </Card.Content>
-          </Card>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -175,12 +206,48 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 20,
   },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
   segmentedButtons: {
+    flexDirection: 'row',
     marginTop: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+  },
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  segmentButtonActive: {
+    backgroundColor: '#6200ee',
+  },
+  segmentButtonText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '600',
+  },
+  segmentButtonTextActive: {
+    color: 'white',
   },
   summaryCard: {
     marginBottom: 20,
     elevation: 2,
+    backgroundColor: 'white',
+    borderRadius: 8,
+  },
+  cardContent: {
+    padding: 16,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -193,14 +260,17 @@ const styles = StyleSheet.create({
   summaryLabel: {
     color: '#666',
     marginBottom: 5,
+    fontSize: 16,
   },
   incomeAmount: {
     color: '#4CAF50',
     fontWeight: 'bold',
+    fontSize: 18,
   },
   expenseAmount: {
     color: '#F44336',
     fontWeight: 'bold',
+    fontSize: 18,
   },
   netIncomeContainer: {
     alignItems: 'center',
@@ -211,10 +281,13 @@ const styles = StyleSheet.create({
   },
   netAmount: {
     fontWeight: 'bold',
+    fontSize: 20,
   },
   categoriesCard: {
     marginBottom: 20,
     elevation: 2,
+    backgroundColor: 'white',
+    borderRadius: 8,
   },
   categoryItem: {
     marginVertical: 10,
@@ -224,56 +297,87 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 5,
   },
+  categoryName: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
   categoryAmount: {
     fontWeight: 'bold',
+    fontSize: 16,
   },
   progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  progressBar: {
+  progressBarBackground: {
     flex: 1,
     height: 8,
     borderRadius: 4,
+    backgroundColor: '#e0e0e0',
+  },
+  progressBarFill: {
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#6200ee',
   },
   percentage: {
     marginLeft: 10,
     color: '#666',
     minWidth: 40,
+    fontSize: 12,
   },
   budgetCard: {
     marginBottom: 20,
     elevation: 2,
+    backgroundColor: 'white',
+    borderRadius: 8,
   },
   budgetItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: 8,
   },
+  budgetLabel: {
+    fontSize: 16,
+    color: '#333',
+  },
   budgetAmount: {
     color: '#6200ee',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   actualAmount: {
     color: '#F44336',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   remainingAmount: {
     color: '#4CAF50',
     fontWeight: 'bold',
+    fontSize: 16,
   },
-  budgetProgress: {
+  budgetProgressBackground: {
     marginTop: 15,
     height: 8,
     borderRadius: 4,
+    backgroundColor: '#e0e0e0',
+  },
+  budgetProgressFill: {
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#4CAF50',
   },
   trendsCard: {
     marginBottom: 20,
     elevation: 2,
+    backgroundColor: 'white',
+    borderRadius: 8,
   },
   trendText: {
     marginVertical: 10,
     color: '#666',
+    fontSize: 16,
+    lineHeight: 24,
   },
   trendStats: {
     flexDirection: 'row',
@@ -286,10 +390,12 @@ const styles = StyleSheet.create({
   trendLabel: {
     color: '#666',
     marginBottom: 5,
+    fontSize: 16,
   },
   trendValue: {
     fontWeight: 'bold',
     color: '#6200ee',
+    fontSize: 18,
   },
 });
 

@@ -1,0 +1,1 @@
+export const validatePhoneNumber = (num: string) => /^[6-9]\d{9}$/.test(num);

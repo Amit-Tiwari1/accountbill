@@ -1,162 +1,222 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import { 
-  Text, 
-  TextInput, 
-  Button, 
-  Card, 
-  Title, 
-  Paragraph 
-} from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Animated,
+  TouchableOpacity,
+  TextInput,
+  Text,
+} from 'react-native';
+import { useTheme } from '../../theme/ThemeContext';
+import { MaterialIcons } from '@react-native-vector-icons/material-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSnackbar } from '../../components/GlobalSnackbar';
+import Colors from '../../theme/Colors';
+import { validatePhoneNumber } from '../../utils/helper';
 
 interface MobileVerificationProps {
   navigation: any;
 }
 
 const MobileVerification: React.FC<MobileVerificationProps> = ({ navigation }) => {
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
-  const [isCodeSent, setIsCodeSent] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { showMessage } = useSnackbar();
+  const theme = useTheme();
+  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const fadeAnim = useState(new Animated.Value(0))[0];
 
-  const handleSendCode = async () => {
-    if (!mobileNumber.trim()) {
-      Alert.alert('Error', 'Please enter a valid mobile number');
-      return;
-    }
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
-    setIsLoading(true);
-    // Simulate API call
+
+
+  const handleGetOTP = () => {
+    setError('');
+    if (!phone.trim()) return showMessage('Please enter your mobile number', 'error');
+    if (!validatePhoneNumber(phone)) return showMessage('Please enter a valid 10-digit mobile number', 'error');
+
+    setLoading(true);
     setTimeout(() => {
-      setIsLoading(false);
-      setIsCodeSent(true);
-      Alert.alert('Success', 'Verification code sent to your mobile number');
-    }, 2000);
-  };
-
-  const handleVerifyCode = async () => {
-    if (!verificationCode.trim()) {
-      Alert.alert('Error', 'Please enter the verification code');
-      return;
-    }
-
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      Alert.alert('Success', 'Mobile number verified successfully!');
-      navigation.replace('AdminStack');
-    }, 2000);
-  };
-
-  const handleResendCode = () => {
-    setIsCodeSent(false);
-    setVerificationCode('');
-    handleSendCode();
+      setLoading(false);
+      navigation.navigate('OTPScreen', { phone: `+91${phone}` });
+    }, 1500);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Card style={styles.card}>
-          <Card.Content>
-            <Title style={styles.title}>Mobile Verification</Title>
-            <Paragraph style={styles.subtitle}>
-              {isCodeSent 
-                ? 'Enter the verification code sent to your mobile number'
-                : 'Enter your mobile number to receive a verification code'
-              }
-            </Paragraph>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.primary }]}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+            {/* HEADER CARD (top 1/3) */}
+            <View style={[styles.mainContent, { backgroundColor: Colors.card }]}>
+              <View style={styles.iconContainer}>
+                <View style={[styles.iconCircle, { backgroundColor: theme.colors.primary }]}>
+                  <MaterialIcons name="phone" size={30} color="#fff" />
+                </View>
+              </View>
+              <Text style={[styles.title, { color: theme.colors.onSurface }]}>
+                Enter your phone number
+              </Text>
+              <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
+                We'll send you a verification code
+              </Text>
+            </View>
 
-            {!isCodeSent ? (
-              <View style={styles.inputContainer}>
+            {/* BODY CONTENT (below header) */}
+            <View style={styles.bodyContent}>
+              {/* Phone Input */}
+              <View style={styles.inputWrapper}>
+                <View style={[styles.countryCode, { backgroundColor: theme.colors.surfaceVariant }]}>
+                  <Text style={[styles.countryCodeText, { color: theme.colors.onSurfaceVariant }]}>+91</Text>
+                </View>
                 <TextInput
-                  label="Mobile Number"
-                  value={mobileNumber}
-                  onChangeText={setMobileNumber}
+                  placeholder="Phone number"
+                  value={phone}
+                  onChangeText={setPhone}
                   keyboardType="phone-pad"
-                  style={styles.input}
-                  mode="outlined"
+                  maxLength={10}
+                  style={[
+                    styles.phoneInput,
+                    {
+                      borderColor: theme.colors.outline,
+                      backgroundColor: theme.colors.surface,
+                      color: theme.colors.onSurface,
+                    },
+                  ]}
+                  placeholderTextColor={theme.colors.onSurfaceVariant}
                 />
-                <Button
-                  mode="contained"
-                  onPress={handleSendCode}
-                  loading={isLoading}
-                  disabled={isLoading}
-                  style={styles.button}
-                >
-                  Send Code
-                </Button>
               </View>
-            ) : (
-              <View style={styles.inputContainer}>
-                <TextInput
-                  label="Verification Code"
-                  value={verificationCode}
-                  onChangeText={setVerificationCode}
-                  keyboardType="number-pad"
-                  style={styles.input}
-                  mode="outlined"
-                />
-                <Button
-                  mode="contained"
-                  onPress={handleVerifyCode}
-                  loading={isLoading}
-                  disabled={isLoading}
-                  style={styles.button}
-                >
-                  Verify Code
-                </Button>
-                <Button
-                  mode="text"
-                  onPress={handleResendCode}
-                  style={styles.resendButton}
-                >
-                  Resend Code
-                </Button>
-              </View>
-            )}
-          </Card.Content>
-        </Card>
-      </View>
+
+              {error ? (
+                <Text style={[styles.errorText, { color: theme.colors.error }]}>{error}</Text>
+              ) : null}
+
+              {/* Submit Button */}
+              <TouchableOpacity
+                onPress={handleGetOTP}
+                disabled={loading}
+                style={[styles.submitButton, { backgroundColor: theme.colors.surface }]}
+              >
+                <Text style={[styles.buttonLabel, { color: theme.colors.primary }]}>
+                  {loading ? 'Sending...' : 'Continue'}
+                </Text>
+              </TouchableOpacity>
+
+              {/* Footer */}
+              <Text style={[styles.footerText, { color: theme.colors.surface }]}>
+                By continuing, you agree to our Terms of Service and Privacy Policy.
+              </Text>
+            </View>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  content: {
-    flex: 1,
+  container: { flex: 1 },
+  keyboardView: { flex: 1 },
+  scrollContent: { flexGrow: 1 },
+  mainContent: {
+    height: '33%', // top third
+    width: '100%',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    alignItems: 'center',
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    elevation: 0,
   },
-  card: {
-    elevation: 4,
+  bodyContent: {
+    flex: 1,
+    paddingHorizontal: 32,
+    paddingTop: 40,
+    alignItems: 'center',
+  },
+  iconContainer: { marginBottom: 24 },
+  iconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
+    fontSize: 26,
+    fontWeight: '700',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 6,
   },
   subtitle: {
+    fontSize: 15,
+    opacity: 0.7,
     textAlign: 'center',
-    marginBottom: 30,
-    color: '#666',
   },
-  inputContainer: {
-    marginTop: 20,
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+    width: '100%',
   },
-  input: {
-    marginBottom: 20,
+  countryCode: {
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginRight: 12,
+    minWidth: 70,
+    alignItems: 'center',
   },
-  button: {
-    marginBottom: 10,
+  countryCodeText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
-  resendButton: {
-    marginTop: 10,
+  phoneInput: {
+    flex: 1,
+    borderRadius: 12,
+    borderWidth: 1,
+    fontSize: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    fontWeight: '500',
+  },
+  submitButton: {
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    marginBottom: 24,
+  },
+  buttonLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  footerText: {
+    textAlign: 'center',
+    fontSize: 12,
+    opacity: 0.6,
+    lineHeight: 18,
+  },
+  errorText: {
+    marginBottom: 12,
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
 

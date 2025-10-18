@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { 
-  TextInput, 
-  Button, 
-  Card, 
-  Title, 
-  Paragraph,
-  SegmentedButtons,
-  Text
-} from 'react-native-paper';
+import { View, StyleSheet, ScrollView, Alert, Text, TextInput, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface AddTransactionScreenProps {
@@ -41,72 +32,88 @@ const AddTransactionScreen: React.FC<AddTransactionScreenProps> = ({ navigation 
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.content}>
-          <Card style={styles.card}>
-            <Card.Content>
-              <Title style={styles.title}>Add Transaction</Title>
-              <Paragraph style={styles.subtitle}>
+          <View style={styles.card}>
+            <View style={styles.cardContent}>
+              <Text style={styles.title}>Add Transaction</Text>
+              <Text style={styles.subtitle}>
                 Record your income or expense
-              </Paragraph>
+              </Text>
 
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Transaction Type</Text>
-                <SegmentedButtons
-                  value={type}
-                  onValueChange={setType}
-                  buttons={[
-                    { value: 'expense', label: 'Expense' },
-                    { value: 'income', label: 'Income' },
-                  ]}
-                  style={styles.segmentedButtons}
-                />
+                <View style={styles.segmentedButtons}>
+                  <TouchableOpacity
+                    style={[
+                      styles.segmentButton,
+                      type === 'expense' && styles.segmentButtonActive
+                    ]}
+                    onPress={() => setType('expense')}
+                  >
+                    <Text style={[
+                      styles.segmentButtonText,
+                      type === 'expense' && styles.segmentButtonTextActive
+                    ]}>
+                      Expense
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.segmentButton,
+                      type === 'income' && styles.segmentButtonActive
+                    ]}
+                    onPress={() => setType('income')}
+                  >
+                    <Text style={[
+                      styles.segmentButtonText,
+                      type === 'income' && styles.segmentButtonTextActive
+                    ]}>
+                      Income
+                    </Text>
+                  </TouchableOpacity>
+                </View>
 
                 <TextInput
-                  label="Amount"
+                  placeholder="Amount"
                   value={amount}
                   onChangeText={setAmount}
                   keyboardType="numeric"
                   style={styles.input}
-                  mode="outlined"
-                  left={<TextInput.Icon icon="currency-usd" />}
                 />
 
                 <TextInput
-                  label="Description"
+                  placeholder="Description"
                   value={description}
                   onChangeText={setDescription}
                   style={styles.input}
-                  mode="outlined"
                   multiline
                 />
 
                 <TextInput
-                  label="Category"
+                  placeholder="Category"
                   value={category}
                   onChangeText={setCategory}
                   style={styles.input}
-                  mode="outlined"
                 />
-                
-                <Button
-                  mode="contained"
-                  onPress={handleSaveTransaction}
-                  loading={isLoading}
-                  disabled={isLoading}
-                  style={styles.button}
-                >
-                  Save Transaction
-                </Button>
 
-                <Button
-                  mode="outlined"
-                  onPress={() => navigation.goBack()}
-                  style={styles.cancelButton}
+                <TouchableOpacity
+                  onPress={handleSaveTransaction}
+                  disabled={isLoading}
+                  style={[styles.button, styles.containedButton]}
                 >
-                  Cancel
-                </Button>
+                  <Text style={styles.containedButtonText}>
+                    {isLoading ? 'Saving...' : 'Save Transaction'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => navigation.goBack()}
+                  style={[styles.cancelButton, styles.outlinedButton]}
+                >
+                  <Text style={styles.outlinedButtonText}>Cancel</Text>
+                </TouchableOpacity>
               </View>
-            </Card.Content>
-          </Card>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -126,15 +133,23 @@ const styles = StyleSheet.create({
   },
   card: {
     elevation: 4,
+    backgroundColor: 'white',
+    borderRadius: 8,
+  },
+  cardContent: {
+    padding: 16,
   },
   title: {
     textAlign: 'center',
     marginBottom: 10,
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   subtitle: {
     textAlign: 'center',
     marginBottom: 30,
     color: '#666',
+    fontSize: 16,
   },
   inputContainer: {
     marginTop: 20,
@@ -143,15 +158,66 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
     color: '#333',
+    fontWeight: '600',
   },
   segmentedButtons: {
+    flexDirection: 'row',
     marginBottom: 20,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+  },
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  segmentButtonActive: {
+    backgroundColor: '#6200ee',
+  },
+  segmentButtonText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '600',
+  },
+  segmentButtonTextActive: {
+    color: 'white',
   },
   input: {
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    backgroundColor: 'white',
   },
   button: {
     marginBottom: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  containedButton: {
+    backgroundColor: '#6200ee',
+  },
+  containedButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  outlinedButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#6200ee',
+  },
+  outlinedButtonText: {
+    color: '#6200ee',
+    fontSize: 16,
+    fontWeight: '600',
   },
   cancelButton: {
     marginTop: 10,
