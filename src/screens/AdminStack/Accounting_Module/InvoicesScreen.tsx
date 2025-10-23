@@ -48,7 +48,7 @@ const InvoicesScreen = () => {
                 contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
             />
 
-            =
+
         </SafeAreaView>
     );
 };

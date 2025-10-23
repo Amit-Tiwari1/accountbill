@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, StyleProp, ViewStyle, Platform, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, StyleProp, ViewStyle, Platform, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createMaterialTopTabNavigator, MaterialTopTabNavigationOptions } from '@react-navigation/material-top-tabs';
 import CustomSearchBar from '../components/CustomSearchBar';
@@ -18,6 +18,7 @@ interface TabbedScreenLayoutProps {
     onSearch?: (text: string) => void;
     onAddPress?: () => void;
     onRefreshPress?: () => void;
+    onMenuPress?: () => void; // open drawer
     backgroundColor?: string;
     containerStyle?: StyleProp<ViewStyle>;
 }
@@ -30,12 +31,14 @@ const TabbedScreenLayout: React.FC<TabbedScreenLayoutProps> = ({
     onSearch,
     onAddPress,
     onRefreshPress,
+    onMenuPress,
     backgroundColor,
     containerStyle,
 }) => {
     const theme = useTheme();
     const [searchText, setSearchText] = useState('');
-    const [showSearch, setShowSearch] = useState(false); // Toggle search bar
+    const [showSearch, setShowSearch] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
 
     const handleSearchChange = (text: string) => {
         setSearchText(text);
@@ -52,13 +55,22 @@ const TabbedScreenLayout: React.FC<TabbedScreenLayoutProps> = ({
                 },
             ]}
         >
+            {/* Overlay to hide menu */}
+            {showMenu && (
+                <TouchableOpacity
+                    style={StyleSheet.absoluteFill}
+                    activeOpacity={1}
+                    onPress={() => setShowMenu(false)}
+                />
+            )}
 
+            {/* Search bar */}
             {showSearch && (
                 <CustomSearchBar
                     placeholder={placeholder}
                     value={searchText}
                     onChangeText={handleSearchChange}
-                    onAddPress={onAddPress}
+                    onClosePress={() => setShowSearch(false)}
                     onRefreshPress={onRefreshPress}
                     containerStyle={{
                         shadowColor: '#000',
@@ -71,7 +83,8 @@ const TabbedScreenLayout: React.FC<TabbedScreenLayoutProps> = ({
                     }}
                 />
             )}
-            {/* Tab Navigator */}
+
+            {/* Tab navigator */}
             <View style={styles.tabContainer}>
                 <Tab.Navigator
                     screenOptions={{
@@ -79,10 +92,7 @@ const TabbedScreenLayout: React.FC<TabbedScreenLayoutProps> = ({
                         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
                         tabBarIndicatorStyle: { backgroundColor: theme.colors.primary },
                         tabBarLabelStyle: { fontWeight: '600' },
-                        tabBarStyle: [
-                            styles.tabBar,
-                            { backgroundColor: theme.colors.surface },
-                        ],
+                        tabBarStyle: [styles.tabBar, { backgroundColor: theme.colors.surface }],
                     }}
                 >
                     {tabs.map((tab) => (
@@ -95,17 +105,52 @@ const TabbedScreenLayout: React.FC<TabbedScreenLayoutProps> = ({
                     ))}
                 </Tab.Navigator>
 
-                {/* Three-dot icon to toggle search */}
+                {/* Three-dot icon to open floating menu */}
                 <TouchableOpacity
                     style={styles.moreIconWrapper}
-                    onPress={() => setShowSearch((prev) => !prev)}
+                    onPress={() => setShowMenu((prev) => !prev)}
                 >
                     <MaterialIcons name="more-vert" size={28} color={theme.colors.primary} />
                 </TouchableOpacity>
+
+                {/* Floating menu */}
+                {showMenu && (
+                    <View style={[styles.floatingMenu, { backgroundColor: theme.colors.surface }]}>
+                        <TouchableOpacity
+                            style={styles.menuItem}
+                            onPress={() => {
+                                setShowMenu(false);
+                                setShowSearch((prev) => !prev);
+                            }}
+                        >
+                            <MaterialIcons name="add" size={20} color={theme.colors.primary} />
+                            <Text style={[styles.menuItemText, { color: theme.colors.primary }]}>Add</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.menuItem}
+                            onPress={() => {
+                                setShowMenu(false);
+                                setShowSearch((prev) => !prev); // toggle search
+                            }}
+                        >
+                            <MaterialIcons name="refresh" size={20} color={theme.colors.primary} />
+                            <Text style={[styles.menuItemText, { color: theme.colors.primary }]}>Refresh</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.menuItem}
+                            onPress={() => {
+                                setShowMenu(false);
+                                setShowSearch((prev) => !prev); // toggle search
+                            }}
+                        >
+                            <MaterialIcons name="search" size={20} color={theme.colors.primary} />
+                            <Text style={[styles.menuItemText, { color: theme.colors.primary }]}>Search</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
-
-            {/* Floating Search Bar */}
-
         </SafeAreaView>
     );
 };
@@ -124,17 +169,36 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 24,
         borderBottomRightRadius: 24,
     },
-    searchBarWrapper: {
-        position: 'absolute',
-        bottom: Platform.OS === 'ios' ? 20 : 80,
-        left: 16,
-        right: 16,
-    },
     moreIconWrapper: {
         position: 'absolute',
         right: 10,
         top: Platform.OS === 'ios' ? 4 : 10,
         zIndex: 50,
         padding: 4,
+    },
+    floatingMenu: {
+        position: 'absolute',
+        top: Platform.OS === 'ios' ? 40 : 46,
+        right: 10,
+        borderRadius: 8,
+        paddingVertical: 5,
+        width: 150,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        zIndex: 100,
+    },
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+    },
+    menuItemText: {
+        fontSize: 16,
+        marginLeft: 8,
+        fontWeight: '600',
     },
 });

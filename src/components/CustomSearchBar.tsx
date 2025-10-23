@@ -7,7 +7,7 @@ interface CustomSearchBarProps {
     placeholder?: string;
     value: string;
     onChangeText: (text: string) => void;
-    onAddPress?: () => void;
+    onClosePress?: () => void;
     onRefreshPress?: () => void;
     containerStyle?: object;
     inputStyle?: object;
@@ -17,7 +17,7 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
     placeholder = 'Search...',
     value,
     onChangeText,
-    onAddPress,
+    onClosePress,
     onRefreshPress,
     containerStyle,
     inputStyle,
@@ -38,13 +38,11 @@ const CustomSearchBar: React.FC<CustomSearchBarProps> = ({
             </View>
 
             <View style={styles.iconContainer}>
-                <TouchableOpacity onPress={onRefreshPress} style={[styles.iconButton, { backgroundColor: theme.colors.lightBackground }]}>
-                    <MaterialIcons name="refresh" size={24} color={theme.colors.surface} />
+                <TouchableOpacity onPress={onClosePress} style={[styles.iconButton, { backgroundColor: theme.colors.primary }]}>
+                    <MaterialIcons name="close" size={24} color={theme.colors.surface} />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={onAddPress} style={[styles.iconButton, { backgroundColor: theme.colors.primary }]}>
-                    <MaterialIcons name="add" size={26} color={theme.colors.surface} />
-                </TouchableOpacity>
+
             </View>
         </View>
     );
