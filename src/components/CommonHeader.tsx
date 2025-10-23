@@ -41,7 +41,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
                         style={[
                             styles.iconButton,
                             {
-                                backgroundColor: theme.colors.lightBackground,
+                                backgroundColor: theme.colors.primary,
                                 width: 40,
                             },
                         ]}
@@ -58,9 +58,9 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
                     >
                         <TouchableOpacity onPress={onRightPress} style={styles.iconButton}>
                             <MaterialIcons
-                                name="account-circle"
+                                name="menu"
                                 size={30}
-                                color={theme.colors.lightBackground}
+                                color={theme.colors.primary}
                             />
                         </TouchableOpacity>
                         <Text
@@ -81,7 +81,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
                         style={[
                             styles.iconButton,
                             {
-                                backgroundColor: theme.colors.lightBackground,
+                                backgroundColor: theme.colors.primary,
                                 width: 30,
                                 height: 30,
                             },

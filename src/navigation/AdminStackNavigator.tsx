@@ -6,11 +6,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Correct 
 import { useTheme } from '../theme/ThemeContext';
 
 // Import screens
-import ExpenseScreen from '../screens/AdminStack/ExpenseScreen';
-import BillsScreen from '../screens/AdminStack/BillsScreen';
-import PartiesScreen from '../screens/AdminStack/PartiesScreen';
-import ProductsScreen from '../screens/AdminStack/ProductsScreen';
-import SettingsScreen from '../screens/AdminStack/SettingsScreen';
+import ExpenseScreen from '../screens/AdminStack/Accounting_Module/ExpenseScreen';
+import BillsScreen from '../screens/AdminStack/Accounting_Module/BillsScreen';
+import PartiesScreen from '../screens/AdminStack/Accounting_Module/PartiesScreen';
+import ProductsScreen from '../screens/AdminStack/Accounting_Module/ProductsScreen';
 
 export type AdminStackParamList = {
   Bills: undefined;
@@ -27,7 +26,7 @@ const screens = [
   { name: 'Parties', component: PartiesScreen, label: 'Parties', icon: 'people', rounded: false },
   { name: 'Bills', component: BillsScreen, label: 'Bills', icon: 'description', rounded: true },
   { name: 'Products', component: ProductsScreen, label: 'Products', icon: 'inventory', rounded: false },
-  { name: 'Settings', component: SettingsScreen, label: 'More', icon: 'more-horiz', rounded: false },
+  // { name: 'Settings', component: SettingsScreen, label: 'More', icon: 'more-horiz', rounded: false },
 ];
 
 const AdminTabNavigator = () => {

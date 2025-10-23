@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme } from '../../theme/ThemeContext';
-import Accordion from '../../components/Accordion';
-import FloatingButton from '../../components/FloatingButton';
+import { useTheme } from '../../../theme/ThemeContext';
+import Accordion from '../../../components/Accordion';
 
 interface Customer {
     id: number;
@@ -49,7 +48,7 @@ const CustomersScreen = () => {
                 contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
             />
 
-            <FloatingButton onPress={addCustomer} backgroundColor={theme.colors.primary} color={theme.colors.onPrimary} />
+
         </SafeAreaView>
     );
 };

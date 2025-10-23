@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { SafeAreaView, FlatList, StyleSheet } from 'react-native';
-import { useTheme } from '../../theme/ThemeContext';
-import Accordion from '../../components/Accordion';
-import FloatingButton from '../../components/FloatingButton';
+import { FlatList, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../../theme/ThemeContext';
+import Accordion from '../../../components/Accordion';
 
 interface Invoice {
     id: number;
@@ -48,11 +48,7 @@ const InvoicesScreen = () => {
                 contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
             />
 
-            <FloatingButton
-                onPress={addInvoice}
-                backgroundColor={theme.colors.primary}
-                color={theme.colors.onPrimary}
-            />
+            =
         </SafeAreaView>
     );
 };

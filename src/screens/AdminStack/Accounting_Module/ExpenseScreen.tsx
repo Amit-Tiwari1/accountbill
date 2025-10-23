@@ -6,15 +6,14 @@ import {
     Text,
     TouchableOpacity,
 } from 'react-native';
-import { useTheme } from '../../theme/ThemeContext';
-import Colors from '../../theme/Colors';
+import { useTheme } from '../../../theme/ThemeContext';
+import Colors from '../../../theme/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@react-native-vector-icons/material-icons';
-import CommonHeader from '../../components/CommonHeader';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import GlobalModal from '../../components/GlobalModel';
-import CustomInput from '../../components/CustomInput';
-import CustomButton from '../../components/CustomButton';
+import GlobalModal from '../../../components/GlobalModel';
+import CustomInput from '../../../components/CustomInput';
+import CustomButton from '../../../components/CustomButton';
 
 interface Expense {
     id: number;
@@ -62,13 +61,7 @@ const ExpenseScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.onPrimary }]}>
-            <CommonHeader
-                title="Hi, Vivek"
-                onBack={() => console.log('Back pressed')}
-                rightIcon="search"
-                onRightPress={() => console.log('Add pressed')}
-                showBackButton={false}
-            />
+
 
             <View style={styles.bodyContent}>
                 <View style={styles.ProgressContainer}>
@@ -118,7 +111,7 @@ const ExpenseScreen: React.FC = () => {
                             Transactions
                         </Text>
                         <TouchableOpacity
-                            style={[styles.addButton, { backgroundColor: theme.colors.lightBackground, flexDirection: 'row' }]}
+                            style={[styles.addButton, { backgroundColor: theme.colors.primary, flexDirection: 'row' }]}
                             onPress={() => setModalVisible(true)}
                         >
                             <MaterialIcons name="add" size={20} color="#fff" />
