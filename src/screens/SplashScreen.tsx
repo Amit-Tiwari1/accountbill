@@ -10,6 +10,7 @@ import {
 import { useTheme } from '../theme/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@react-native-vector-icons/material-icons';
+import { getDBConnection } from '../Database/database';
 
 interface SplashScreenProps {
   navigation: any;
@@ -25,84 +26,82 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   const textTranslateY = useRef(new Animated.Value(30)).current;
   const backgroundOpacity = useRef(new Animated.Value(0)).current;
 
+
+
   useEffect(() => {
-    // Start the animation sequence
-    const startAnimation = () => {
-      // Background fade in
-      Animated.timing(backgroundOpacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+    const runAnimation = async () => {
+      try {
+        const db = await getDBConnection();
+        console.log('✅ Database connected successfully:', db);
+        // Background fade in
+        Animated.timing(backgroundOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
 
-      // Logo animation sequence
-      Animated.sequence([
-        // Logo fade in and scale up
-        Animated.parallel([
-          Animated.timing(logoOpacity, {
-            toValue: 1,
-            duration: 600,
-            easing: Easing.out(Easing.cubic),
-            useNativeDriver: true,
-          }),
-          Animated.timing(logoScale, {
-            toValue: 1,
-            duration: 800,
-            easing: Easing.out(Easing.back(1.2)),
-            useNativeDriver: true,
-          }),
-        ]),
+        // Logo animation sequence
+        Animated.sequence([
+          Animated.parallel([
+            Animated.timing(logoOpacity, {
+              toValue: 1,
+              duration: 600,
+              easing: Easing.out(Easing.cubic),
+              useNativeDriver: true,
+            }),
+            Animated.timing(logoScale, {
+              toValue: 1,
+              duration: 800,
+              easing: Easing.out(Easing.back(1.2)),
+              useNativeDriver: true,
+            }),
+          ]),
+          Animated.delay(500),
+          Animated.parallel([
+            Animated.timing(textOpacity, {
+              toValue: 1,
+              duration: 400,
+              easing: Easing.out(Easing.cubic),
+              useNativeDriver: true,
+            }),
+            Animated.timing(textTranslateY, {
+              toValue: 0,
+              duration: 400,
+              easing: Easing.out(Easing.cubic),
+              useNativeDriver: true,
+            }),
+          ]),
+          Animated.delay(800),
+          Animated.parallel([
+            Animated.timing(logoOpacity, {
+              toValue: 0,
+              duration: 500,
+              easing: Easing.in(Easing.cubic),
+              useNativeDriver: true,
+            }),
+            Animated.timing(textOpacity, {
+              toValue: 0,
+              duration: 500,
+              easing: Easing.in(Easing.cubic),
+              useNativeDriver: true,
+            }),
+            Animated.timing(backgroundOpacity, {
+              toValue: 0,
+              duration: 500,
+              easing: Easing.in(Easing.cubic),
+              useNativeDriver: true,
+            }),
+          ]),
+        ]).start(() => {
+          navigation.replace('AuthStack');
+        });
 
-        // Hold the logo for a moment
-        Animated.delay(500),
-
-        // Text animation
-        Animated.parallel([
-          Animated.timing(textOpacity, {
-            toValue: 1,
-            duration: 400,
-            easing: Easing.out(Easing.cubic),
-            useNativeDriver: true,
-          }),
-          Animated.timing(textTranslateY, {
-            toValue: 0,
-            duration: 400,
-            easing: Easing.out(Easing.cubic),
-            useNativeDriver: true,
-          }),
-        ]),
-
-        // Hold everything for a moment
-        Animated.delay(800),
-
-        // Fade out everything
-        Animated.parallel([
-          Animated.timing(logoOpacity, {
-            toValue: 0,
-            duration: 500,
-            easing: Easing.in(Easing.cubic),
-            useNativeDriver: true,
-          }),
-          Animated.timing(textOpacity, {
-            toValue: 0,
-            duration: 500,
-            easing: Easing.in(Easing.cubic),
-            useNativeDriver: true,
-          }),
-          Animated.timing(backgroundOpacity, {
-            toValue: 0,
-            duration: 500,
-            easing: Easing.in(Easing.cubic),
-            useNativeDriver: true,
-          }),
-        ]),
-      ]).start(() => {
-        // Navigate to the next screen after animation completes
-        navigation.replace('AuthStack');
-      });
+      } catch (error) {
+        console.error('DB connection error:', error);
+      }
     };
 
-    startAnimation();
+    runAnimation();
   }, [navigation, logoScale, logoOpacity, textOpacity, textTranslateY, backgroundOpacity]);
 
   return (

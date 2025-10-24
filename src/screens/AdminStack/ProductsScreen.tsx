@@ -1,14 +1,16 @@
 import { View, StyleSheet } from 'react-native';
 import React from 'react';
-import { useTheme } from '../../../theme/ThemeContext';
+import { useTheme } from '../../theme/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import CommonHeader from '../../components/CommonHeader';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import InvoicesScreen from './InvoicesScreen';
-import QuatationScreen from './QuatationScreen';
+import ItemsScreen from './ItemsScreen';
+import ServicesScreen from './ServicesScreen';
+import Colors from '../../theme/Colors';
 
 const Tab = createMaterialTopTabNavigator();
 
-const BillsScreen = () => {
+const ProductsScreen = () => {
     const theme = useTheme();
 
     return (
@@ -17,7 +19,6 @@ const BillsScreen = () => {
             borderBottomLeftRadius: 24,
             borderBottomRightRadius: 24,
         }]}>
-
 
             <View style={styles.tabContainer}>
                 <Tab.Navigator
@@ -32,8 +33,8 @@ const BillsScreen = () => {
                         ],
                     }}
                 >
-                    <Tab.Screen name="Invoices" component={InvoicesScreen} />
-                    <Tab.Screen name="Quatations" component={QuatationScreen} />
+                    <Tab.Screen name="Items" component={ItemsScreen} />
+                    <Tab.Screen name="Servies" component={ServicesScreen} />
                 </Tab.Navigator>
             </View>
         </SafeAreaView>
@@ -62,4 +63,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default BillsScreen;
+export default ProductsScreen;

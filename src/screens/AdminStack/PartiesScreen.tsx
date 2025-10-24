@@ -1,10 +1,12 @@
 import { View, StyleSheet } from 'react-native';
 import React from 'react';
-import { useTheme } from '../../../theme/ThemeContext';
+import { useTheme } from '../../theme/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import CommonHeader from '../../components/CommonHeader';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import CustomersScreen from './CustomersScreen';
 import SuppliersScreen from './SuppliersScreen';
+import Colors from '../../theme/Colors';
 
 const Tab = createMaterialTopTabNavigator();
 

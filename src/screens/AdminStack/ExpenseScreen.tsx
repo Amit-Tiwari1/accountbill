@@ -6,14 +6,14 @@ import {
     Text,
     TouchableOpacity,
 } from 'react-native';
-import { useTheme } from '../../../theme/ThemeContext';
-import Colors from '../../../theme/Colors';
+import { useTheme } from '../../theme/ThemeContext';
+import Colors from '../../theme/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@react-native-vector-icons/material-icons';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import GlobalModal from '../../../components/GlobalModel';
-import CustomInput from '../../../components/CustomInput';
-import CustomButton from '../../../components/CustomButton';
+import GlobalModal from '../../components/GlobalModel';
+import CustomInput from '../../components/CustomInput';
+import CustomButton from '../../components/CustomButton';
 
 interface Expense {
     id: number;
