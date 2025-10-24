@@ -20,7 +20,6 @@ export const getDBConnection = async (): Promise<DBConnection> => {
             }
         );
 
-        // Note: react-native-sqlite-2 doesn't have a separate error callback
-        // If you need error handling, you'll need to wrap database operations in try-catch
+
     });
 };

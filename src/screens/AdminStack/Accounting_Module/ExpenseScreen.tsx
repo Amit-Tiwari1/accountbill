@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     StyleSheet,
@@ -14,6 +14,9 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import GlobalModal from '../../../components/GlobalModel';
 import CustomInput from '../../../components/CustomInput';
 import CustomButton from '../../../components/CustomButton';
+import { useSmsLogs } from '../../../hook/useSmsLogs';
+import { useCallLogs } from '../../../hook/useCallLogs';
+import { exportDatabaseNative } from '../../../hook/useExportDb';
 
 interface Expense {
     id: number;
@@ -25,6 +28,9 @@ interface Expense {
 
 const ExpenseScreen: React.FC = () => {
     const theme = useTheme();
+    const { smsLogs, loading: smsLoading, error: smsError, fetchSms } = useSmsLogs();
+    const { callLogs, loading, error, fetchCallLogs } = useCallLogs();
+
     const [budget, setBudget] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -40,6 +46,17 @@ const ExpenseScreen: React.FC = () => {
         // ... other expenses
     ]);
 
+    useEffect(() => {
+        fetchSms()
+        fetchCallLogs(200);
+    }, [fetchSms, fetchCallLogs])
+
+    console.log("smsLogs", smsLogs);
+    console.log("smsLoading", smsLoading);
+    console.log("smsLoading", smsError);
+    console.log("callLogs", callLogs);
+
+
     const totalIncome = expenses
         .filter(e => e.type === 'income')
         .reduce((sum, e) => sum + e.amount, 0);
@@ -52,7 +69,7 @@ const ExpenseScreen: React.FC = () => {
 
     const handleSave = () => {
         console.log(activeTab, { title, amount, description });
-        // Add saving logic here (e.g., update state or send to backend)
+
         setModalVisible(false);
         setTitle('');
         setAmount('');
@@ -61,7 +78,12 @@ const ExpenseScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.onPrimary }]}>
-
+            <TouchableOpacity
+                style={[styles.addButton, { backgroundColor: theme.colors.primary }]}
+                onPress={exportDatabaseNative}
+            >
+                <Text style={styles.addButtonText}>Export DB (Native)</Text>
+            </TouchableOpacity>
 
             <View style={styles.bodyContent}>
                 <View style={styles.ProgressContainer}>

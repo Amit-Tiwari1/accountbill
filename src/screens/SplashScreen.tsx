@@ -11,6 +11,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@react-native-vector-icons/material-icons';
 import { getDBConnection } from '../Database/database';
+import { testDbConnection } from '../hook/useExportDb';
 
 interface SplashScreenProps {
   navigation: any;
@@ -31,8 +32,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   useEffect(() => {
     const runAnimation = async () => {
       try {
-        const db = await getDBConnection();
-        console.log('✅ Database connected successfully:', db);
+        const db = await testDbConnection();
         // Background fade in
         Animated.timing(backgroundOpacity, {
           toValue: 1,

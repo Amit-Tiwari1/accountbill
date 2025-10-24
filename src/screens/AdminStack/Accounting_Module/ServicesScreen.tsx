@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { SafeAreaView, FlatList, StyleSheet } from 'react-native';
-import { useTheme } from '../../theme/ThemeContext';
-import Accordion from '../../components/Accordion';
-import FloatingButton from '../../components/FloatingButton';
+import { useTheme } from '../../../theme/ThemeContext';
+import Accordion from '../../../components/Accordion';
+import FloatingButton from '../../../components/FloatingButton';
 
 interface Service {
     id: number;
@@ -14,7 +14,7 @@ interface Service {
 
 const ServicesScreen = () => {
     const theme = useTheme();
-    const [services, setServices] = useState < Service[] > ([
+    const [services, setServices] = useState<Service[]>([
         { id: 1, name: 'Web Design', code: 'SR-1001', price: '₹25,000', details: 'Includes UI/UX and responsive design' },
         { id: 2, name: 'SEO Optimization', code: 'SR-1002', price: '₹10,000', details: 'On-page and Off-page SEO' },
         { id: 3, name: 'Social Media Marketing', code: 'SR-1003', price: '₹15,000', details: 'Facebook & Instagram campaigns' },

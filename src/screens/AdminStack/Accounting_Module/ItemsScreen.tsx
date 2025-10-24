@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { SafeAreaView, FlatList, StyleSheet } from 'react-native';
-import { useTheme } from '../../theme/ThemeContext';
-import Accordion from '../../components/Accordion';
-import FloatingButton from '../../components/FloatingButton';
+import { useTheme } from '../../../theme/ThemeContext';
+import Accordion from '../../../components/Accordion';
+import FloatingButton from '../../../components/FloatingButton';
 
 interface Item {
     id: number;
