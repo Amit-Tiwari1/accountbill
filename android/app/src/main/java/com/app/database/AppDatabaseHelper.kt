@@ -1,4 +1,4 @@
-package com.app
+package com.app.database
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -13,8 +13,7 @@ class AppDatabaseHelper(context: Context) :
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(
-            """
+        val createExpensesTable = """
             CREATE TABLE IF NOT EXISTS expenses (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 type TEXT,
@@ -22,15 +21,13 @@ class AppDatabaseHelper(context: Context) :
                 amount REAL,
                 date TEXT,
                 description TEXT
-            )
-            """.trimIndent()
-        )
+            );
+        """.trimIndent()
+        db.execSQL(createExpensesTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // Future migrations
-        if (oldVersion < 2) {
-            // Example: db.execSQL("ALTER TABLE expenses ADD COLUMN notes TEXT;")
-        }
+        db.execSQL("DROP TABLE IF EXISTS expenses")
+        onCreate(db)
     }
 }

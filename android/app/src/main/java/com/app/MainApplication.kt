@@ -16,11 +16,11 @@ class MainApplication : Application(), ReactApplication {
         PackageList(this).packages.apply {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // add(MyReactNativePackage())
-          add(SmsPackage()) 
-          add(SmsSenderPackage())
-          add(WhatsAppPackage())
-          add(CallLogPackage())
-          add(DatabasePackage()) 
+         add(SmsModule(reactContext))
+         add(WhatsAppModule(reactContext))
+         add(CallLogModule(reactContext))
+         add(NotificationModule(reactContext))
+         add(DatabaseModule(reactContext))
 
         },
     )
