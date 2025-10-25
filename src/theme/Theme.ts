@@ -44,24 +44,4 @@ export const LightTheme: AppTheme = {
     },
 };
 
-export const DarkTheme: AppTheme = {
-    roundness: 12,
-    colors: {
-        primary: Colors.primaryLight,
-        onPrimary: '#000000',
-        secondary: Colors.secondaryLight,
-        background: Colors.dark.background,
-        surface: Colors.dark.surface,
-        onSurface: Colors.dark.textPrimary,
-        error: Colors.error,
-        outline: Colors.dark.border,
-        onSurfaceVariant: Colors.dark.textSecondary,
-        primaryContainer: Colors.primary,
-        secondaryContainer: Colors.secondary,
-        onSecondaryContainer: '#FFFFFF',
-        errorContainer: Colors.error,
-        onErrorContainer: '#FFFFFF',
-        surfaceVariant: Colors.dark.surface,
-        lightBackground: Colors.primaryLight
-    },
-};
+

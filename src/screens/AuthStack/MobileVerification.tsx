@@ -70,7 +70,7 @@ const MobileVerification: React.FC<MobileVerificationProps> = ({ navigation }) =
                   <MaterialIcons name="phone" size={30} color="#fff" />
                 </View>
               </View>
-              <Text style={[styles.title, { color: theme.colors.onSurface }]}>
+              <Text style={[styles.title, { color: theme.colors.primary }]}>
                 Enter your phone number
               </Text>
               <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>

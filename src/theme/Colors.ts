@@ -1,9 +1,8 @@
 // Colors.ts
 export const Colors = {
-    // Primary brand colors (Material Design Blue)
-    primary: '#1976D2', // Material Design Blue 700
-    primaryDark: '#1565C0', // Material Design Blue 800
-    primaryLight: '#8ec7f5ff', // Material Design Blue 400
+    primary: '#1976D2',
+    primaryDark: '#1565C0',
+    primaryLight: '#8ec7f5ff',
 
     // Secondary / Accent colors
     secondary: '#1A73E8', // Google Blue
@@ -17,7 +16,7 @@ export const Colors = {
 
     // Text colors
     textPrimary: '#202124', // Dark gray/black text
-    textSecondary: '#5F6368', // Lighter gray
+    textSecondary: '#817f7fff', // Lighter gray
     textDisabled: '#9AA0A6',
 
     // Borders and dividers
@@ -37,9 +36,10 @@ export const Colors = {
     // Dark mode colors (optional)
     dark: {
         background: '#202124',
-        surface: '#2D2E30',
-        textPrimary: '#E8EAED',
-        textSecondary: '#BDC1C6',
+        surface: '#151516ff',
+        textPrimary: '#151516ff',
+        textSecondary: 'rgba(196, 196, 197, 1)',
+        placeholerTxt: "#bbb7b7ff",
         border: '#3C4043',
     },
 };

@@ -7,6 +7,13 @@ import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 
+
+import com.app.database.DatabasePackage
+import com.app.nativeutils.SmsPackage
+import com.app.nativeutils.WhatsAppPackage
+import com.app.nativeutils.CallLogPackage
+import com.app.nativeutils.NotificationPackage
+
 class MainApplication : Application(), ReactApplication {
 
   override val reactHost: ReactHost by lazy {
@@ -16,11 +23,11 @@ class MainApplication : Application(), ReactApplication {
         PackageList(this).packages.apply {
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // add(MyReactNativePackage())
-         add(SmsModule(reactContext))
-         add(WhatsAppModule(reactContext))
-         add(CallLogModule(reactContext))
-         add(NotificationModule(reactContext))
-         add(DatabaseModule(reactContext))
+                 add(SmsPackage())
+                add(WhatsAppPackage())
+                add(CallLogPackage())
+                add(NotificationPackage())
+                add(DatabasePackage())
 
         },
     )

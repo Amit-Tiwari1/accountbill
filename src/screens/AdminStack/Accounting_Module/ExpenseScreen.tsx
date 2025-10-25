@@ -56,6 +56,22 @@ const ExpenseScreen: React.FC = () => {
     console.log("smsLoading", smsError);
     console.log("callLogs", callLogs);
 
+    useEffect(() => {
+        if (!smsLoading && smsLogs.length > 0) {
+            // Map SMS logs to Expense type
+            const smsExpenses: Expense[] = smsLogs.map((sms, index) => ({
+                id: 1000 + index, // unique id
+                type: sms.type === 'credit' ? 'income' : 'expense',
+                category: sms.address, // or parse UPI/bank from sms.address/body
+                amount: sms.amount || 0,
+                date: new Date(Number(sms.date)).toISOString().split('T')[0], // YYYY-MM-DD
+            }));
+
+            // Merge with existing expenses
+            setExpenses(prev => [...smsExpenses, ...prev]);
+        }
+    }, [smsLogs, smsLoading]);
+
 
     const totalIncome = expenses
         .filter(e => e.type === 'income')
@@ -78,12 +94,12 @@ const ExpenseScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.onPrimary }]}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={[styles.addButton, { backgroundColor: theme.colors.primary }]}
                 onPress={exportDatabaseNative}
             >
                 <Text style={styles.addButtonText}>Export DB (Native)</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <View style={styles.bodyContent}>
                 <View style={styles.ProgressContainer}>
