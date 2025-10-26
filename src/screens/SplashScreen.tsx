@@ -10,7 +10,7 @@ import {
 import { useTheme } from '../theme/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@react-native-vector-icons/material-icons';
-import { getDBConnection } from '../Database/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { testDbConnection } from '../hook/useExportDb';
 
 interface SplashScreenProps {
@@ -32,7 +32,22 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   useEffect(() => {
     const runAnimation = async () => {
       try {
-        const db = await testDbConnection();
+        await testDbConnection();
+        const checkAuth = async () => {
+          try {
+            const token = await AsyncStorage.getItem('token');
+
+            if (token) {
+              navigation.replace('AdminDrawer');
+            } else {
+              // ❌ No token → go to AuthStack
+              navigation.replace('AuthStack');
+            }
+          } catch (e) {
+            console.log('Error checking auth', e);
+            navigation.replace('AuthStack');
+          }
+        };
         // Background fade in
         Animated.timing(backgroundOpacity, {
           toValue: 1,
@@ -93,7 +108,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
             }),
           ]),
         ]).start(() => {
-          navigation.replace('AuthStack');
+          checkAuth()
         });
 
       } catch (error) {
@@ -103,6 +118,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
 
     runAnimation();
   }, [navigation, logoScale, logoOpacity, textOpacity, textTranslateY, backgroundOpacity]);
+
+
 
   return (
     <Animated.View style={[styles.container, {

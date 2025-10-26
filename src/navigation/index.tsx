@@ -19,20 +19,17 @@ const RootStack = createStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
 
-  const { token, deviceInfo, error } = useFCMToken();
+  const { token } = useFCMToken();
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (token) {
       dispatch(setFcmToken(token));
-      console.log("FCM Token saved to Redux:", token);
     }
   }, [token]);
 
-  console.log("fcm token", token);
-  console.log("fcm error", error);
-  console.log("deviceInfo", deviceInfo);
+
   return (
     <RootStack.Navigator
       screenOptions={{

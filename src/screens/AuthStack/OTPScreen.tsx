@@ -15,6 +15,11 @@ import { MaterialIcons } from '@react-native-vector-icons/material-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '../../theme/Colors';
 import { showToast } from '../../hook/useToast';
+import { useHeaderAnimation } from '../../Animations/useHeaderAnimation';
+import { useAppDispatch } from '../../hook/hooks';
+import { verifyOtp } from '../../redux/slices/authSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 interface OTPScreenProps {
     navigation: any;
@@ -22,12 +27,18 @@ interface OTPScreenProps {
 }
 
 const OTPScreen: React.FC<OTPScreenProps> = ({ navigation, route }) => {
-    const { phone } = route.params;
+    const { phone, responseData } = route.params;
     const theme = useTheme();
+    const dispatch = useAppDispatch()
+
+
 
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputsRef = useRef<TextInput[]>([]);
     const fadeAnim = useState(new Animated.Value(0))[0];
+    const AnimatedMaterialIcons = Animated.createAnimatedComponent(MaterialIcons);
+    const { titleAnim, subtitleAnim, iconAnim, iconSize, circleSize } = useHeaderAnimation();
+
 
     const [counter, setCounter] = useState(30);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -74,7 +85,7 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ navigation, route }) => {
     };
 
     const handleOTPChange = (text: string, index: number) => {
-        if (!/^\d*$/.test(text)) return; // only digits
+        if (!/^\d*$/.test(text)) return;
         const newOtp = [...otp];
         newOtp[index] = text;
         setOtp(newOtp);
@@ -86,13 +97,31 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ navigation, route }) => {
         }
     };
 
-    const handleVerifyOTP = () => {
+    const handleVerifyOTP = async () => {
         const code = otp.join('');
-        if (code.length !== 6) return showToast.error('nter a valid 6-digit OTP');
-        showToast.success('OTP Verified!');
-        navigation.replace('AdminDrawer');
+        const { userId } = responseData;
 
+        if (code.length !== 6) {
+            return showToast.error('Enter a valid 6-digit OTP');
+        }
+
+        try {
+            const response = await dispatch(verifyOtp({ userId, otp: code })).unwrap();
+            console.log("otp res", response);
+            if (response.success) {
+                if (response.token) {
+                    await AsyncStorage.setItem('token', response.token);
+                }
+                showToast.success(response.message);
+                navigation.replace('AdminDrawer');
+            } else {
+                showToast.error(response.message);
+            }
+        } catch (error: any) {
+            showToast.error(error || 'OTP verification failed');
+        }
     };
+
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.primary }]}>
@@ -107,23 +136,48 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ navigation, route }) => {
                 >
                     <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
                         <View style={[styles.mainContent, { backgroundColor: Colors.card }]}>
-                            <View style={styles.iconContainer}>
-                                <View style={[styles.iconCircle, { backgroundColor: theme.colors.primary }]}>
-                                    <MaterialIcons name="lock" size={30} color="#fff" />
-                                </View>
-                            </View>
-                            <Text style={[styles.title, { color: theme.colors.onSurface }]}>
+                            <Animated.View
+                                style={[
+                                    styles.iconCircle,
+                                    {
+                                        backgroundColor: theme.colors.primary,
+                                        width: circleSize,
+                                        height: circleSize,
+                                        borderRadius: Animated.divide(circleSize, 2),
+                                        transform: [{ scale: iconAnim }],
+                                    },
+                                ]}
+                            >
+                                <Animated.View style={{ transform: [{ scale: iconAnim }] }}>
+                                    <AnimatedMaterialIcons name="lock" size={iconSize} color="#fff" />
+                                </Animated.View>
+                            </Animated.View>
+
+                            <Animated.Text
+                                style={[
+                                    styles.title,
+                                    { color: theme.colors.onSurface, transform: [{ scale: titleAnim }] },
+                                ]}
+                            >
                                 Verify OTP
-                            </Text>
-                            <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
-                                Enter the 6-digit code that you recive
-                            </Text>
+                            </Animated.Text>
+
+                            <Animated.Text
+                                style={[
+                                    styles.subtitle,
+                                    { color: theme.colors.onSurfaceVariant, opacity: subtitleAnim },
+                                ]}
+                            >
+                                Enter the 6-digit code you received
+                            </Animated.Text>
+
                             <TouchableOpacity onPress={handleChangeNumber}>
                                 <Text style={[styles.changeNumber, { color: theme.colors.primary }]}>
                                     Change Number
                                 </Text>
                             </TouchableOpacity>
                         </View>
+
 
                         {/* OTP Boxes */}
                         <View style={styles.bodyContent}>

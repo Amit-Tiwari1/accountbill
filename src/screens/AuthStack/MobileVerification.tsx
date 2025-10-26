@@ -56,10 +56,9 @@ const MobileVerification: React.FC<MobileVerificationProps> = ({ navigation }) =
 
     try {
       const response = await dispatch(sendOtp({ phone, fcmToken: fcmToken ?? '' })).unwrap();
-      console.log(response);
 
       if (response.success) {
-        navigation.navigate('OTPScreen', { phone: `+91${phone}` });
+        navigation.navigate('OTPScreen', { phone: `+91${phone}`, responseData: response.data });
         showToast.success(response?.data?.message);
       } else {
         showToast.error(response?.data?.message);

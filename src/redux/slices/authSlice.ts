@@ -24,12 +24,10 @@ export const sendOtp = createAsyncThunk(
     async ({ phone, fcmToken }: { phone: string; fcmToken: string }, { rejectWithValue }) => {
         try {
 
-            const url = '?route=company/register';
-            console.log('POSTing to:', `${api.defaults.baseURL}${url}`);
-            console.log('Payload:', { phone, fcmToken });
-            const response = await api.post('?route=company/register', {
+
+            const response = await api.post('?route=auth/sendOtp', {
                 phone,
-                fcmToken, // ✅ send both phone and token
+                fcmToken,
             });
 
             return {
@@ -46,13 +44,18 @@ export const sendOtp = createAsyncThunk(
 // Verify OTP API call
 export const verifyOtp = createAsyncThunk(
     'auth/verifyOtp',
-    async (
-        payload: { phone: string; otp: string },
-        { rejectWithValue }
+    async ({ userId, otp }: { userId: string; otp: string }, { rejectWithValue }
     ) => {
+
+        console.log(userId, otp);
+
         try {
-            const response = await axios.post('http://localhost:8000/verifyOtp.php', payload);
-            // Assuming API returns { token, phone }
+            const response = await api.post('?route=auth/verifyOtp', {
+                userId,
+                otp,
+            });
+
+
             return response.data;
         } catch (err: any) {
             return rejectWithValue(err.response?.data?.error || 'OTP verification failed');

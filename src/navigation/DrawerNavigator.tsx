@@ -86,12 +86,6 @@ const DrawerNavigator = () => {
                                 </View>
                             </View>
 
-                            <TouchableOpacity
-                                onPress={toggleDrawer}
-                                style={[styles.closeButton, { backgroundColor: theme.colors.surface }]}
-                            >
-                                <MaterialIcons name="close" size={28} color={theme.colors.primary} />
-                            </TouchableOpacity>
                         </View>
 
                         {/* Menu Items */}

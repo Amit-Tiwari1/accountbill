@@ -55,7 +55,7 @@ export const testDbConnection = async () => {
     try {
         const res: string = await DatabaseModule.testDatabaseConnection();
         console.log(res);
-        Alert.alert(res);
+        // Alert.alert(res);
     } catch (err) {
         console.error(err);
         Alert.alert('DB connection failed: ' + err);

@@ -51,10 +51,10 @@ const ExpenseScreen: React.FC = () => {
         fetchCallLogs(200);
     }, [fetchSms, fetchCallLogs])
 
-    console.log("smsLogs", smsLogs);
-    console.log("smsLoading", smsLoading);
-    console.log("smsLoading", smsError);
-    console.log("callLogs", callLogs);
+    // console.log("smsLogs", smsLogs);
+    // console.log("smsLoading", smsLoading);
+    // console.log("smsLoading", smsError);
+    // console.log("callLogs", callLogs);
 
     useEffect(() => {
         if (!smsLoading && smsLogs.length > 0) {
