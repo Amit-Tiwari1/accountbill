@@ -19,13 +19,15 @@ function App() {
       <SafeAreaProvider>
         <ThemeProvider theme={theme}>
           <StatusBar
-            barStyle={'light-content'}
+            barStyle={'dark-content'}
             backgroundColor={theme.colors.background}
           />
           <AppNavigator />
         </ThemeProvider>
       </SafeAreaProvider>
     </Provider>
+
+
   );
 }
 

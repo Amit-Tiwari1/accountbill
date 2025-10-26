@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -9,45 +9,54 @@ import {
     Image,
 } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { createStackNavigator } from '@react-navigation/stack';
 import { useTheme } from '../theme/ThemeContext';
 import AdminTabNavigator from './AdminStackNavigator';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import CommonHeader from '../components/CommonHeader';
+import { useDrawerAnimation } from '../Animations/drawerAnimation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '.';
+import { useNavigation } from '@react-navigation/native';
+import ConfirmationDialog from '../components/ConfirmationDialog';
+import { useTokenChecker } from '../hook/useTokenChecker';
+import SessionExpiredModal from '../components/SessionExpiredModal';
+
 
 const { width } = Dimensions.get('window');
 const DrawerWidth = width * 0.7;
+type DrawerNavProp = StackNavigationProp<RootStackParamList, 'AdminDrawer'>;
+
 
 const DrawerNavigator = () => {
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [selectedModule, setSelectedModule] = useState("Account management");
-    const animation = useRef(new Animated.Value(0)).current;
     const theme = useTheme();
+    const { payload } = useTokenChecker();
+    const navigation = useNavigation<DrawerNavProp>();
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
+    const [selectedModule, setSelectedModule] = useState("Account management");
 
-    const toggleDrawer = () => {
-        Animated.timing(animation, {
-            toValue: drawerOpen ? 0 : 1,
-            duration: 250,
-            useNativeDriver: true,
-        }).start(() => setDrawerOpen(!drawerOpen));
+    const { drawerTranslate, contentTranslate, overlayOpacity, toggleDrawer } = useDrawerAnimation();
+
+    console.log("useTokenChecker", payload);
+
+
+    const handleToggleDrawer = () => {
+        toggleDrawer(drawerOpen, () => setDrawerOpen(!drawerOpen));
     };
 
-    const drawerTranslate = animation.interpolate({
-        inputRange: [0, 1],
-        outputRange: [-DrawerWidth, 0],
-    });
+    const handleLogOut = async () => {
+        setShowDialog(true)
+        try {
+            await AsyncStorage.removeItem('token');
+            navigation.replace('AuthStack');
+        } catch (e) {
+            console.log('Logout error:', e);
+        } finally {
+            setShowDialog(false)
+        }
+    }
 
-    const contentTranslate = animation.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, DrawerWidth],
-    });
-
-    const overlayOpacity = animation.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, 0.4],
-    });
-
-    // Example company details (replace with dynamic data)
     const companyDetails = {
         name: 'ACME Corp.',
         email: 'contact@acme.com',
@@ -101,7 +110,7 @@ const DrawerNavigator = () => {
                                 key={idx}
                                 onPress={() => {
                                     setSelectedModule(item.label);
-                                    toggleDrawer();
+                                    handleToggleDrawer()
                                 }}
                                 style={styles.drawerItem}
                             >
@@ -132,7 +141,7 @@ const DrawerNavigator = () => {
 
                         <TouchableOpacity
                             style={[styles.bottomButton,]}
-                            onPress={() => console.log('Logout pressed')}
+                            onPress={() => setShowDialog(true)}
                         >
                             <MaterialIcons name="logout" size={30} color={theme.colors.primary} />
 
@@ -156,7 +165,7 @@ const DrawerNavigator = () => {
                 <CommonHeader
                     title="Hi Vvek"
                     showBackButton={false}
-                    onRightPress={toggleDrawer}
+                    onRightPress={handleToggleDrawer}
                     onBack={() => console.log('Back pressed')}
                     rightIcon="account-circle"
                 />
@@ -184,14 +193,26 @@ const DrawerNavigator = () => {
             </Animated.View>
 
             {/* Overlay */}
-            {drawerOpen && (
-                <Animated.View
-                    style={[StyleSheet.absoluteFill, { backgroundColor: '#000', opacity: overlayOpacity }]}
-                >
-                    <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={toggleDrawer} />
-                </Animated.View>
-            )}
-        </View>
+            {
+                drawerOpen && (
+                    <Animated.View
+                        style={[StyleSheet.absoluteFill, { backgroundColor: '#000', opacity: overlayOpacity }]}
+                    >
+                        <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={handleToggleDrawer} />
+                    </Animated.View>
+                )
+            }
+
+            <ConfirmationDialog
+                visible={showDialog}
+                message="Are you sure you want to Logout?"
+                onConfirm={handleLogOut}
+                onCancel={() => setShowDialog(false)}
+            />
+
+
+
+        </View >
     );
 };
 

@@ -9,6 +9,7 @@ interface CustomButtonProps {
     style?: ViewStyle;
     textStyle?: TextStyle;
     backgroundColor?: string;
+    disabled?: boolean;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -17,6 +18,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     style,
     textStyle,
     backgroundColor,
+    disabled = false, // ✅ Default false
 }) => {
     const theme = useTheme();
 
@@ -24,12 +26,23 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         <TouchableOpacity
             style={[
                 styles.button,
-                { backgroundColor: backgroundColor || theme.colors.primary },
+                {
+                    backgroundColor: backgroundColor || theme.colors.primary,
+                    opacity: disabled ? 0.6 : 1, // ✅ Visual feedback for disabled state
+                },
                 style,
+                disabled && styles.disabledButton, // ✅ Additional disabled styles
             ]}
             onPress={onPress}
+            disabled={disabled} // ✅ Native disabled prop
         >
-            <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+            <Text style={[
+                styles.buttonText,
+                textStyle,
+                disabled && styles.disabledText // ✅ Optional disabled text styling
+            ]}>
+                {title}
+            </Text>
         </TouchableOpacity>
     );
 };
@@ -46,6 +59,14 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         color: '#fff',
+    },
+    disabledButton: {
+        // Additional disabled styles if needed
+        // backgroundColor: '#cccccc', // You can override background color when disabled
+    },
+    disabledText: {
+        // Additional text styles for disabled state
+        // color: '#999999',
     },
 });
 

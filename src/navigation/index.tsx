@@ -8,11 +8,14 @@ import CustomDrawerNavigator from './/DrawerNavigator'; // ✅ use this instead 
 import { useAppDispatch } from '../hook/hooks';
 import { useFCMToken } from '../hook/useFCMToken';
 import { setFcmToken } from '../redux/slices/fcmSlice';
+import TokenCheckerWrapper from '../components/TokenCheckerWrapper';
+import CompleteProfile from '../screens/AdminStack/CompleteProfileScreen';
 
 export type RootStackParamList = {
   SplashScreen: undefined;
   AuthStack: undefined;
   AdminDrawer: undefined;
+  CompleteProfile: undefined;
 };
 
 const RootStack = createStackNavigator<RootStackParamList>();
@@ -30,6 +33,8 @@ const RootNavigator = () => {
   }, [token]);
 
 
+
+
   return (
     <RootStack.Navigator
       screenOptions={{
@@ -41,6 +46,7 @@ const RootNavigator = () => {
       <RootStack.Screen name="AuthStack" component={AuthStackNavigator} />
       {/* After login → Drawer + Tabs */}
       <RootStack.Screen name="AdminDrawer" component={CustomDrawerNavigator} />
+      <RootStack.Screen name="CompleteProfile" component={CompleteProfile} />
     </RootStack.Navigator>
   );
 };
@@ -48,7 +54,9 @@ const RootNavigator = () => {
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <RootNavigator />
+      <TokenCheckerWrapper>
+        <RootNavigator />
+      </TokenCheckerWrapper>
     </NavigationContainer>
   );
 };

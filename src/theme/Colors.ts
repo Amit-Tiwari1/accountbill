@@ -16,7 +16,7 @@ export const Colors = {
 
     // Text colors
     textPrimary: '#202124', // Dark gray/black text
-    textSecondary: '#817f7fff', // Lighter gray
+    textSecondary: '#c2c0c0ff', // Lighter gray
     textDisabled: '#9AA0A6',
 
     // Borders and dividers

@@ -7,15 +7,17 @@ interface CommonHeaderProps {
     title: string;
     onBack?: () => void;
     showBackButton?: boolean;
+    showMenuButton?: boolean;
     rightIcon?: string;
     onRightPress?: () => void;
-    roundedBottom?: boolean; // ✅ new prop to toggle border radius
+    roundedBottom?: boolean;
 }
 
 const CommonHeader: React.FC<CommonHeaderProps> = ({
     title,
     onBack,
     showBackButton = true,
+    showMenuButton = true,
     rightIcon,
     onRightPress,
     roundedBottom = true, // ✅ default true
@@ -49,6 +51,7 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
                         <MaterialIcons name="arrow-back" size={28} color={theme.colors.surface} />
                     </TouchableOpacity>
                 ) : (
+
                     <View
                         style={{
                             flexDirection: 'row',
@@ -56,20 +59,26 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
                             alignItems: 'center',
                         }}
                     >
-                        <TouchableOpacity onPress={onRightPress} style={styles.iconButton}>
-                            <MaterialIcons
-                                name="menu"
-                                size={30}
-                                color={theme.colors.primary}
-                            />
-                        </TouchableOpacity>
+                        {
+                            showMenuButton &&
+                            (
+                                <TouchableOpacity onPress={onRightPress} style={styles.iconButton}>
+                                    <MaterialIcons
+                                        name="menu"
+                                        size={30}
+                                        color={theme.colors.primary}
+                                    />
+                                </TouchableOpacity>
+                            )
+                        }
                         <Text
-                            style={[styles.title, { color: theme.colors.onSurfaceVariant }]}
+                            style={[styles.title, { color: theme.colors.onSurface }]}
                             numberOfLines={1}
                         >
                             {title}
                         </Text>
                     </View>
+
                 )}
             </View>
 

@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@react-native-vector-icons/material-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { testDbConnection } from '../hook/useExportDb';
+import { decodeJwt } from '../utils/jwtHelper';
 
 interface SplashScreenProps {
   navigation: any;
@@ -36,18 +37,35 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
         const checkAuth = async () => {
           try {
             const token = await AsyncStorage.getItem('token');
-
             if (token) {
-              navigation.replace('AdminDrawer');
+              const { payload } = decodeJwt(token);
+              console.log("runAnimation", payload);
+
+              if (payload) {
+                const user = payload.user;
+                const company = payload.company;
+
+                const isTempUser =
+                  user.firstName === 'User' ||
+                  user.email?.startsWith('temp_') ||
+                  company.name?.startsWith('Temporary');
+
+                if (isTempUser) {
+                  navigation.reset({ index: 0, routes: [{ name: 'CompleteProfile' }] });
+                  return;
+                }
+              }
+
+              navigation.reset({ index: 0, routes: [{ name: 'AdminDrawer' }] });
             } else {
-              // ❌ No token → go to AuthStack
-              navigation.replace('AuthStack');
+              navigation.reset({ index: 0, routes: [{ name: 'AuthStack' }] });
             }
           } catch (e) {
             console.log('Error checking auth', e);
-            navigation.replace('AuthStack');
+            navigation.reset({ index: 0, routes: [{ name: 'AuthStack' }] });
           }
         };
+
         // Background fade in
         Animated.timing(backgroundOpacity, {
           toValue: 1,
@@ -127,7 +145,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
       opacity: backgroundOpacity
     }]}>
       <StatusBar
-        barStyle="light-content"
+        barStyle="dark-content"
         backgroundColor={theme.colors.background}
         translucent
       />
