@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -13,21 +13,29 @@ import {
 import { useTheme } from '../../theme/ThemeContext';
 import { MaterialIcons } from '@react-native-vector-icons/material-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useSnackbar } from '../../components/GlobalSnackbar';
 import Colors from '../../theme/Colors';
 import { validatePhoneNumber } from '../../utils/helper';
+import { showToast } from '../../hook/useToast';
+import { useHeaderAnimation } from '../../Animations/useHeaderAnimation';
+import { sendOtp } from '../../redux/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '../../hook/hooks';
 
 interface MobileVerificationProps {
   navigation: any;
 }
 
 const MobileVerification: React.FC<MobileVerificationProps> = ({ navigation }) => {
-  const { showMessage } = useSnackbar();
   const theme = useTheme();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const AnimatedMaterialIcons = Animated.createAnimatedComponent(MaterialIcons);
+
+  const { titleAnim, subtitleAnim, iconSize, circleSize, circleRadius } = useHeaderAnimation();
+
+  const dispatch = useAppDispatch();
+  const isLoading = useAppSelector((state) => state.auth.loading);
+  const fcmToken = useAppSelector((state) => state.fcm.token);
   const [phone, setPhone] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const fadeAnim = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -37,19 +45,32 @@ const MobileVerification: React.FC<MobileVerificationProps> = ({ navigation }) =
     }).start();
   }, []);
 
-
-
-  const handleGetOTP = () => {
+  const handleGetOTP = async () => {
     setError('');
-    if (!phone.trim()) return showMessage('Please enter your mobile number', 'error');
-    if (!validatePhoneNumber(phone)) return showMessage('Please enter a valid 10-digit mobile number', 'error');
+    if (!phone.trim()) {
+      return showToast.error('Please enter your mobile number');
+    }
+    if (!validatePhoneNumber(phone)) {
+      return showToast.error('Please enter a valid 10-digit mobile number');
+    }
 
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate('OTPScreen', { phone: `+91${phone}` });
-    }, 1500);
+    try {
+      const response = await dispatch(sendOtp({ phone, fcmToken: fcmToken ?? '' })).unwrap();
+      console.log(response);
+
+      if (response.success) {
+        navigation.navigate('OTPScreen', { phone: `+91${phone}` });
+        showToast.success(response?.data?.message);
+      } else {
+        showToast.error(response?.data?.message);
+      }
+
+    } catch (err: any) {
+      setError(err.message || 'Failed to send OTP');
+      showToast.error(err.message || 'Failed to send OTP');
+    }
   };
+
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.primary }]}>
@@ -63,24 +84,35 @@ const MobileVerification: React.FC<MobileVerificationProps> = ({ navigation }) =
           showsVerticalScrollIndicator={false}
         >
           <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-            {/* HEADER CARD (top 1/3) */}
             <View style={[styles.mainContent, { backgroundColor: Colors.card }]}>
-              <View style={styles.iconContainer}>
-                <View style={[styles.iconCircle, { backgroundColor: theme.colors.primary }]}>
-                  <MaterialIcons name="phone" size={30} color="#fff" />
-                </View>
-              </View>
-              <Text style={[styles.title, { color: theme.colors.primary }]}>
+              <Animated.View
+                style={{
+                  width: circleSize,
+                  height: circleSize,
+                  borderRadius: circleRadius,
+                  backgroundColor: theme.colors.primary,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginBottom: 24,
+                }}
+              >
+                <AnimatedMaterialIcons name="phone" size={iconSize} color="#fff" />
+              </Animated.View>
+
+              <Animated.Text
+                style={[styles.title, { color: theme.colors.primary, transform: [{ scale: titleAnim }] }]}
+              >
                 Enter your phone number
-              </Text>
-              <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
+              </Animated.Text>
+
+              <Animated.Text
+                style={[styles.subtitle, { color: theme.colors.onSurfaceVariant, opacity: subtitleAnim }]}
+              >
                 We'll send you a verification code
-              </Text>
+              </Animated.Text>
             </View>
 
-            {/* BODY CONTENT (below header) */}
             <View style={styles.bodyContent}>
-              {/* Phone Input */}
               <View style={styles.inputWrapper}>
                 <View style={[styles.countryCode, { backgroundColor: theme.colors.surfaceVariant }]}>
                   <Text style={[styles.countryCodeText, { color: theme.colors.onSurfaceVariant }]}>+91</Text>
@@ -103,22 +135,18 @@ const MobileVerification: React.FC<MobileVerificationProps> = ({ navigation }) =
                 />
               </View>
 
-              {error ? (
-                <Text style={[styles.errorText, { color: theme.colors.error }]}>{error}</Text>
-              ) : null}
 
-              {/* Submit Button */}
+
               <TouchableOpacity
                 onPress={handleGetOTP}
-                disabled={loading}
+                disabled={isLoading}
                 style={[styles.submitButton, { backgroundColor: theme.colors.surface }]}
               >
                 <Text style={[styles.buttonLabel, { color: theme.colors.primary }]}>
-                  {loading ? 'Sending...' : 'Continue'}
+                  {isLoading ? 'Sending...' : 'Continue'}
                 </Text>
               </TouchableOpacity>
 
-              {/* Footer */}
               <Text style={[styles.footerText, { color: theme.colors.surface }]}>
                 By continuing, you agree to our Terms of Service and Privacy Policy.
               </Text>
@@ -135,7 +163,7 @@ const styles = StyleSheet.create({
   keyboardView: { flex: 1 },
   scrollContent: { flexGrow: 1 },
   mainContent: {
-    height: '33%', // top third
+    height: '33%',
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
@@ -148,25 +176,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingTop: 40,
     alignItems: 'center',
-  },
-  iconContainer: { marginBottom: 24 },
-  iconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 15,
-    opacity: 0.7,
-    textAlign: 'center',
   },
   inputWrapper: {
     flexDirection: 'row',
@@ -212,6 +221,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     opacity: 0.6,
     lineHeight: 18,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 15,
+    opacity: 0.7,
+    textAlign: 'center',
   },
   errorText: {
     marginBottom: 12,

@@ -29,6 +29,7 @@ class MainApplication : Application(), ReactApplication {
                 add(NotificationPackage())
                 add(DatabasePackage())
 
+
         },
     )
   }

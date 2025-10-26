@@ -5,23 +5,27 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation';
 import { LightTheme } from './src/theme/Theme';
 import { ThemeProvider } from './src/theme/ThemeContext';
-import { SnackbarProvider } from './src/components/GlobalSnackbar';
+import { Provider } from 'react-redux';
+import { store } from './src/redux/store';
 
 function App() {
   const theme = LightTheme;
 
+
+
+
   return (
-    <SafeAreaProvider>
-      <ThemeProvider theme={theme}>
-        <SnackbarProvider>
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <ThemeProvider theme={theme}>
           <StatusBar
             barStyle={'light-content'}
             backgroundColor={theme.colors.background}
           />
           <AppNavigator />
-        </SnackbarProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </Provider>
   );
 }
 

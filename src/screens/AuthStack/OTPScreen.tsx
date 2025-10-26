@@ -14,7 +14,7 @@ import { useTheme } from '../../theme/ThemeContext';
 import { MaterialIcons } from '@react-native-vector-icons/material-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '../../theme/Colors';
-import { useSnackbar } from '../../components/GlobalSnackbar';
+import { showToast } from '../../hook/useToast';
 
 interface OTPScreenProps {
     navigation: any;
@@ -24,7 +24,6 @@ interface OTPScreenProps {
 const OTPScreen: React.FC<OTPScreenProps> = ({ navigation, route }) => {
     const { phone } = route.params;
     const theme = useTheme();
-    const { showMessage } = useSnackbar();
 
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputsRef = useRef<TextInput[]>([]);
@@ -61,7 +60,7 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ navigation, route }) => {
         setCounter(30);
         setOtp(['', '', '', '', '', '']);
         inputsRef.current[0]?.focus();
-        showMessage('OTP resent successfully!', 'success');
+        showToast.success('OTP resent successfully!');
 
         timerRef.current = setInterval(() => {
             setCounter((prev) => {
@@ -89,9 +88,8 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ navigation, route }) => {
 
     const handleVerifyOTP = () => {
         const code = otp.join('');
-        if (code.length !== 6) return showMessage('Enter a valid 6-digit OTP', 'error');
-
-        showMessage('OTP Verified!', 'success');
+        if (code.length !== 6) return showToast.error('nter a valid 6-digit OTP');
+        showToast.success('OTP Verified!');
         navigation.replace('AdminDrawer');
 
     };
@@ -118,7 +116,7 @@ const OTPScreen: React.FC<OTPScreenProps> = ({ navigation, route }) => {
                                 Verify OTP
                             </Text>
                             <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
-                                Enter the 6-digit code sent to {phone}
+                                Enter the 6-digit code that you recive
                             </Text>
                             <TouchableOpacity onPress={handleChangeNumber}>
                                 <Text style={[styles.changeNumber, { color: theme.colors.primary }]}>

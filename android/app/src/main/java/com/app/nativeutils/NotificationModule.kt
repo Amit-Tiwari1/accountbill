@@ -4,7 +4,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import android.provider.Settings
 import com.facebook.react.bridge.*
+import com.google.firebase.messaging.FirebaseMessaging
+
 
 class NotificationModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     override fun getName() = "NotificationModule"
@@ -28,5 +31,40 @@ class NotificationModule(reactContext: ReactApplicationContext) : ReactContextBa
             nm.notify(System.currentTimeMillis().toInt(), notification)
             promise.resolve("Notification sent")
         } catch (e: Exception) { promise.reject("NOTIFY_ERROR", e.message) }
+    }
+
+       @ReactMethod
+    fun getDeviceInfo(promise: Promise) {
+        try {
+            val info = Arguments.createMap()
+            info.putString("brand", Build.BRAND)
+            info.putString("model", Build.MODEL)
+            info.putString("os", "Android")
+            info.putString("osVersion", Build.VERSION.RELEASE)
+
+            // Unique device ID
+            val androidId = Settings.Secure.getString(
+                reactApplicationContext.contentResolver,
+                Settings.Secure.ANDROID_ID
+            )
+            info.putString("deviceId", androidId)
+
+            promise.resolve(info)
+        } catch (e: Exception) {
+            promise.reject("DEVICE_INFO_ERROR", e.message)
+        }
+    }
+
+    @ReactMethod
+    fun getFCMToken(promise: Promise) {
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    promise.reject("FCM_TOKEN_ERROR", task.exception?.message)
+                    return@addOnCompleteListener
+                }
+                val token = task.result
+                promise.resolve(token)
+            }
     }
 }

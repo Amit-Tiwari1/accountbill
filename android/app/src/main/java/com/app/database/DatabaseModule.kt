@@ -103,4 +103,16 @@ class DatabaseModule(reactContext: ReactApplicationContext) :
             promise.reject("EXPORT_ERROR", e.message)
         }
     }
+
+    @ReactMethod
+    fun testDatabaseConnection(promise: Promise) {
+        try {
+            val db = AppDatabaseHelper(reactApplicationContext).readableDatabase
+            db.close()
+            promise.resolve("Database connection successful")
+        } catch (e: Exception) {
+            promise.reject("DB_CONNECTION_ERROR", e.message)
+        }
+    }
+
 }
