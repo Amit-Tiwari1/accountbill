@@ -13,6 +13,8 @@ import { MaterialIcons } from '@react-native-vector-icons/material-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { testDbConnection } from '../hook/useExportDb';
 import { decodeJwt } from '../utils/jwtHelper';
+import { useAppDispatch, useAppSelector } from '../hook/hooks';
+import { fetchCompanyById } from '../redux/slices/companySlice';
 
 interface SplashScreenProps {
   navigation: any;
@@ -20,6 +22,7 @@ interface SplashScreenProps {
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   const theme = useTheme();
+  const dispatch = useAppDispatch();
 
   // Animation values
   const logoScale = useRef(new Animated.Value(0.3)).current;
@@ -28,43 +31,15 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   const textTranslateY = useRef(new Animated.Value(30)).current;
   const backgroundOpacity = useRef(new Animated.Value(0)).current;
 
-
+  // Use useRef for navigation destination to persist across renders
+  const navigationDestination = useRef<any>(null);
 
   useEffect(() => {
     const runAnimation = async () => {
       try {
         await testDbConnection();
-        const checkAuth = async () => {
-          try {
-            const token = await AsyncStorage.getItem('token');
-            if (token) {
-              const { payload } = decodeJwt(token);
-              console.log("runAnimation", payload);
 
-              if (payload) {
-                const user = payload.user;
-                const company = payload.company;
-
-                const isTempUser =
-                  user.firstName === 'User' ||
-                  user.email?.startsWith('temp_') ||
-                  company.name?.startsWith('Temporary');
-
-                if (isTempUser) {
-                  navigation.reset({ index: 0, routes: [{ name: 'CompleteProfile' }] });
-                  return;
-                }
-              }
-
-              navigation.reset({ index: 0, routes: [{ name: 'AdminDrawer' }] });
-            } else {
-              navigation.reset({ index: 0, routes: [{ name: 'AuthStack' }] });
-            }
-          } catch (e) {
-            console.log('Error checking auth', e);
-            navigation.reset({ index: 0, routes: [{ name: 'AuthStack' }] });
-          }
-        };
+        const authPromise = checkAuth();
 
         // Background fade in
         Animated.timing(backgroundOpacity, {
@@ -105,39 +80,122 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
             }),
           ]),
           Animated.delay(800),
+        ]).start(async () => {
+          await authPromise;
+
           Animated.parallel([
             Animated.timing(logoOpacity, {
               toValue: 0,
-              duration: 500,
+              duration: 300,
               easing: Easing.in(Easing.cubic),
               useNativeDriver: true,
             }),
             Animated.timing(textOpacity, {
               toValue: 0,
-              duration: 500,
+              duration: 300,
               easing: Easing.in(Easing.cubic),
               useNativeDriver: true,
             }),
             Animated.timing(backgroundOpacity, {
               toValue: 0,
-              duration: 500,
+              duration: 300,
               easing: Easing.in(Easing.cubic),
               useNativeDriver: true,
             }),
-          ]),
-        ]).start(() => {
-          checkAuth()
+          ]).start(() => {
+            if (navigationDestination.current) {
+              navigation.reset(navigationDestination.current);
+            }
+          });
         });
 
       } catch (error) {
         console.error('DB connection error:', error);
+        navigation.reset({ index: 0, routes: [{ name: 'AuthStack' }] });
       }
     };
 
+    const checkAuth = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+
+        if (!token) {
+          // No token → go to Auth stack
+          navigationDestination.current = {
+            index: 0,
+            routes: [{ name: 'AuthStack' }],
+          };
+          return;
+        }
+
+        // Decode token payload
+        const { payload } = decodeJwt(token);
+        console.log("payload", payload);
+
+        if (!payload || !payload.company?.id) {
+          console.error('Invalid token payload');
+          navigationDestination.current = {
+            index: 0,
+            routes: [{ name: 'AuthStack' }],
+          };
+          return;
+        }
+
+        const companyId = parseInt(payload.company.id);
+        if (isNaN(companyId)) {
+          console.error('Invalid company ID:', payload.company.id);
+          navigationDestination.current = {
+            index: 0,
+            routes: [{ name: 'AuthStack' }],
+          };
+          return;
+        }
+
+        // Fetch company details
+        const result = await dispatch(fetchCompanyById(companyId)).unwrap();
+        console.log('Company Fetch Result:', result);
+
+        // Your API returns { status: "success", data: { ... } }
+        if (result.status === 'success' && result.data) {
+          const { name, email } = result.data;
+
+          const isTempUser =
+            name?.toLowerCase().startsWith('temporary') ||
+            (email && email.startsWith('temp_'));
+
+          if (isTempUser) {
+            navigationDestination.current = {
+              index: 0,
+              routes: [{ name: 'CompleteProfile' }],
+            };
+            return;
+          }
+
+          // ✅ Normal company user
+          navigationDestination.current = {
+            index: 0,
+            routes: [{ name: 'AdminDrawer' }],
+          };
+        } else {
+          // If API fails → go to Auth stack
+          console.error('Company fetch failed:', result);
+          navigationDestination.current = {
+            index: 0,
+            routes: [{ name: 'AuthStack' }],
+          };
+        }
+      } catch (e) {
+        console.log('Error checking auth', e);
+        navigationDestination.current = {
+          index: 0,
+          routes: [{ name: 'AuthStack' }],
+        };
+      }
+    };
+
+
     runAnimation();
-  }, [navigation, logoScale, logoOpacity, textOpacity, textTranslateY, backgroundOpacity]);
-
-
+  }, [navigation, logoScale, logoOpacity, textOpacity, textTranslateY, backgroundOpacity, dispatch]);
 
   return (
     <Animated.View style={[styles.container, {

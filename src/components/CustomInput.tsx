@@ -1,4 +1,3 @@
-// components/CustomInput.tsx
 import React from 'react';
 import {
     TextInput,
@@ -13,14 +12,16 @@ interface CustomInputProps extends Omit<TextInputProps, 'keyboardType'> {
     value: string;
     onChangeText: (text: string) => void;
     placeholder?: string;
-    keyboardType?: KeyboardTypeOptions; // ✅ Correctly typed
+    keyboardType?: KeyboardTypeOptions;
 }
 
 const CustomInput: React.FC<CustomInputProps> = ({
     value,
     onChangeText,
     placeholder = '',
-    keyboardType = 'default', // ✅ Default safely typed
+    keyboardType = 'default',
+    editable = true,
+    style,
     ...props
 }) => {
     const theme = useTheme();
@@ -29,13 +30,20 @@ const CustomInput: React.FC<CustomInputProps> = ({
         <TextInput
             style={[
                 styles.input,
-                { borderColor: Colors.border, color: theme.colors.onSurface, backgroundColor: '#f7f6f6ff' },
+                {
+                    borderColor: Colors.border,
+                    color: theme.colors.onSurface,
+                    backgroundColor: editable ? '#f7f6f6ff' : '#f9fafb'
+                },
+                !editable && styles.disabledInput,
+                style,
             ]}
             value={value}
             onChangeText={onChangeText}
             placeholder={placeholder}
             placeholderTextColor={theme.colors.onSurfaceVariant}
-            keyboardType={keyboardType} // ✅ No type errors now
+            keyboardType={keyboardType}
+            editable={editable}
             {...props}
         />
     );
@@ -48,8 +56,10 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 10,
         fontSize: 16,
-        fontWeight: 'normal', // ✅ Default to normal
-        borderColor: Colors.border,
+        fontWeight: 'normal',
+    },
+    disabledInput: {
+        opacity: 0.7,
     },
 });
 

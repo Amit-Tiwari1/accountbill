@@ -1,4 +1,3 @@
-// src/navigation/AppNavigator.tsx
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,12 +9,14 @@ import { useFCMToken } from '../hook/useFCMToken';
 import { setFcmToken } from '../redux/slices/fcmSlice';
 import TokenCheckerWrapper from '../components/TokenCheckerWrapper';
 import CompleteProfile from '../screens/AdminStack/CompleteProfileScreen';
+import Settings from '../screens/AdminStack/SettingsScreen';
 
 export type RootStackParamList = {
   SplashScreen: undefined;
   AuthStack: undefined;
   AdminDrawer: undefined;
   CompleteProfile: undefined;
+  Settings: undefined;
 };
 
 const RootStack = createStackNavigator<RootStackParamList>();
@@ -47,6 +48,7 @@ const RootNavigator = () => {
       {/* After login → Drawer + Tabs */}
       <RootStack.Screen name="AdminDrawer" component={CustomDrawerNavigator} />
       <RootStack.Screen name="CompleteProfile" component={CompleteProfile} />
+      <RootStack.Screen name="Settings" component={Settings} />
     </RootStack.Navigator>
   );
 };

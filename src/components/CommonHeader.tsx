@@ -1,11 +1,17 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // ✅ fixed import
+import { useAppSelector } from '../hook/hooks';
+import api from '../services/api/axiosInstance';
+import { getLogoUrl } from '../utils/helper';
+import Colors from '../theme/Colors';
+import { useNavigation } from '@react-navigation/native';
 
 interface CommonHeaderProps {
-    title: string;
-    onBack?: () => void;
+    title?: string;
+    Subtitle?: string;
+
     showBackButton?: boolean;
     showMenuButton?: boolean;
     rightIcon?: string;
@@ -15,7 +21,8 @@ interface CommonHeaderProps {
 
 const CommonHeader: React.FC<CommonHeaderProps> = ({
     title,
-    onBack,
+    Subtitle,
+
     showBackButton = true,
     showMenuButton = true,
     rightIcon,
@@ -23,6 +30,15 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
     roundedBottom = true, // ✅ default true
 }) => {
     const theme = useTheme();
+    const navigation = useNavigation();
+    const { currentCompany } = useAppSelector((state: any) => state.company);
+
+
+    console.log("currentCompany", currentCompany);
+
+    const handleBackPress = () => {
+        navigation.goBack();
+    };
 
     return (
         <View
@@ -38,18 +54,33 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
             {/* Left Section */}
             <View style={styles.leftSection}>
                 {showBackButton ? (
-                    <TouchableOpacity
-                        onPress={onBack}
-                        style={[
-                            styles.iconButton,
-                            {
-                                backgroundColor: theme.colors.primary,
-                                width: 40,
-                            },
-                        ]}
+
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}
                     >
-                        <MaterialIcons name="arrow-back" size={28} color={theme.colors.surface} />
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={handleBackPress}
+                            style={[
+                                styles.iconButton,
+                                {
+                                    backgroundColor: theme.colors.primary,
+                                    width: 30,
+                                },
+                            ]}
+                        >
+                            <MaterialIcons name="arrow-back" size={28} color={theme.colors.surface} />
+                        </TouchableOpacity>
+                        <Text
+                            style={[styles.title, { color: theme.colors.onSurface }]}
+                            numberOfLines={1}
+                        >
+                            {Subtitle}
+                        </Text>
+                    </View>
                 ) : (
 
                     <View
@@ -93,14 +124,27 @@ const CommonHeader: React.FC<CommonHeaderProps> = ({
                                 backgroundColor: theme.colors.primary,
                                 width: 30,
                                 height: 30,
+                                borderRadius: 15, // Make it circular
+                                overflow: 'hidden', // Clip the image to rounded corners
                             },
                         ]}
                     >
-                        <MaterialIcons
-                            name={rightIcon as any}
-                            size={25}
-                            color={theme.colors.surface}
-                        />
+                        {currentCompany?.logo ? (
+                            <Image
+                                source={{
+                                    uri: getLogoUrl(currentCompany.logo) as string
+                                }}
+                                style={styles.companyLogo}
+                                resizeMode="cover"
+                                onError={(e) => console.log('Failed to load company logo:', e.nativeEvent.error)}
+                            />
+                        ) : (
+                            <MaterialIcons
+                                name={rightIcon as any}
+                                size={20} // Slightly smaller to fit better
+                                color={theme.colors.surface}
+                            />
+                        )}
                     </TouchableOpacity>
                 ) : (
                     <View style={styles.placeholder} />
@@ -128,9 +172,29 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'flex-end',
     },
+    companyLogo: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+
+        // White border to separate from shadow
+        borderWidth: 1,
+        borderColor: Colors.primary,
+
+        // Shadow
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+
+        elevation: 5,
+    },
     iconButton: {
-        width: 40,
-        height: 40,
+        width: 30,
+        height: 30,
         borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',

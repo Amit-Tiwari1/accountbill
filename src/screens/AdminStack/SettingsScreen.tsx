@@ -39,7 +39,13 @@ const SettingsScreen = () => {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.onPrimary }]}>
 
+            <CommonHeader
+                Subtitle="Setting"
+                showBackButton={true}
+                onRightPress={() => console.log('Back pressed')}
 
+                rightIcon="account-circle"
+            />
             {/* User Details */}
             <View style={[styles.userContainer, { backgroundColor: theme.colors.surface }]}>
                 <Image

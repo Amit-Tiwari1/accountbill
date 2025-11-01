@@ -94,12 +94,7 @@ const ExpenseScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.onPrimary }]}>
-            {/* <TouchableOpacity
-                style={[styles.addButton, { backgroundColor: theme.colors.primary }]}
-                onPress={exportDatabaseNative}
-            >
-                <Text style={styles.addButtonText}>Export DB (Native)</Text>
-            </TouchableOpacity> */}
+
 
             <View style={styles.bodyContent}>
                 <View style={styles.ProgressContainer}>
@@ -149,7 +144,7 @@ const ExpenseScreen: React.FC = () => {
                             Transactions
                         </Text>
                         <TouchableOpacity
-                            style={[styles.addButton, { backgroundColor: theme.colors.lightBackground, flexDirection: 'row' }]}
+                            style={[styles.addButton, { backgroundColor: theme.colors.primary, flexDirection: 'row' }]}
                             onPress={() => setModalVisible(true)}
                         >
                             <MaterialIcons name="add" size={20} color="#fff" />
@@ -230,7 +225,7 @@ const styles = StyleSheet.create({
     bodyContent: { flex: 1, paddingHorizontal: 15, paddingTop: 10 },
     sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
     ProgressContainer: { alignItems: 'center', backgroundColor: Colors.card, borderRadius: 20, padding: 10, },
-    transactionsContainer: { backgroundColor: Colors.card, borderRadius: 20, padding: 15, marginTop: 10, height: '51%' },
+    transactionsContainer: { backgroundColor: Colors.card, borderRadius: 20, padding: 15, marginTop: 10, height: '55%' },
     circleText: { fontSize: 18, fontWeight: '600' },
     totalsContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
     totalCard: { flex: 0.48, padding: 16, borderRadius: 12, alignItems: 'center', marginTop: 10 },

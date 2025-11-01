@@ -28,6 +28,9 @@ interface OTPScreenProps {
 
 const OTPScreen: React.FC<OTPScreenProps> = ({ navigation, route }) => {
     const { phone, responseData } = route.params;
+
+    console.log("responseData", responseData);
+
     const theme = useTheme();
     const dispatch = useAppDispatch()
 

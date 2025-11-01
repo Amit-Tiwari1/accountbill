@@ -20,13 +20,12 @@ import { RootStackParamList } from '.';
 import { useNavigation } from '@react-navigation/native';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import { useTokenChecker } from '../hook/useTokenChecker';
-import SessionExpiredModal from '../components/SessionExpiredModal';
-
+import { useAppSelector } from '../hook/hooks';
+import { getLogoUrl } from '../utils/helper';
 
 const { width } = Dimensions.get('window');
 const DrawerWidth = width * 0.7;
 type DrawerNavProp = StackNavigationProp<RootStackParamList, 'AdminDrawer'>;
-
 
 const DrawerNavigator = () => {
     const theme = useTheme();
@@ -35,11 +34,8 @@ const DrawerNavigator = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [selectedModule, setSelectedModule] = useState("Account management");
-
     const { drawerTranslate, contentTranslate, overlayOpacity, toggleDrawer } = useDrawerAnimation();
-
-    console.log("useTokenChecker", payload);
-
+    const { currentCompany } = useAppSelector((state: any) => state.company);
 
     const handleToggleDrawer = () => {
         toggleDrawer(drawerOpen, () => setDrawerOpen(!drawerOpen));
@@ -57,11 +53,14 @@ const DrawerNavigator = () => {
         }
     }
 
-    const companyDetails = {
-        name: 'ACME Corp.',
-        email: 'contact@acme.com',
-        logo: 'https://i.ibb.co/7pR9qZc/acme-logo.png',
-    };
+    const menuItems = [
+        { label: "Account management", icon: "account-balance", module: "account_management" },
+        { label: "Staff and staff attendance management", icon: "people", module: "staff_attendance" },
+        { label: "Payrolls management", icon: "payment", module: "payrolls_management" },
+        { label: "Lead's management", icon: "supervisor-account", module: "lead_management" },
+        { label: "Social media marketing management", icon: "share", module: "social_media_marketing" },
+        { label: "Ad-hoc reports management", icon: "assessment", module: "adhoc_reports" },
+    ];
 
     return (
         <View style={{ flex: 1, backgroundColor: theme.colors.background, }}>
@@ -81,62 +80,84 @@ const DrawerNavigator = () => {
                         <View style={[styles.drawerHeader, { backgroundColor: theme.colors.primary }]}>
                             <View style={styles.companyInfo}>
                                 <Image
-                                    source={{ uri: companyDetails.logo }}
+                                    source={{
+                                        uri: currentCompany?.logo
+                                            ? getLogoUrl(currentCompany.logo) as string
+                                            : 'https://via.placeholder.com/150'
+                                    }}
                                     style={styles.companyLogo}
                                     resizeMode="cover"
                                 />
                                 <View style={{ marginLeft: 10 }}>
-                                    <Text style={[styles.companyName, { color: theme.colors.surface }]}>
-                                        {companyDetails.name}
-                                    </Text>
+                                    <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+                                        <Text style={[styles.companyName, { color: theme.colors.surface }]}>
+                                            {currentCompany?.name}
+                                        </Text>
+
+                                        <TouchableOpacity onPress={() => navigation.navigate("CompleteProfile")}>
+                                            <MaterialIcons
+                                                name="edit-note"
+                                                size={20}
+                                                color={theme.colors.surface}
+                                                style={{ marginRight: 10 }}
+                                            />
+                                        </TouchableOpacity>
+                                    </View>
                                     <Text style={[styles.companyEmail, { color: theme.colors.surface }]}>
-                                        {companyDetails.email}
+                                        {currentCompany?.email}
                                     </Text>
                                 </View>
                             </View>
-
                         </View>
 
                         {/* Menu Items */}
-                        {[
-                            { label: "Account management", icon: "account-balance", module: "account_management" },
-                            { label: "Staff and staff attendance management", icon: "people", module: "staff_attendance" },
-                            { label: "Payrolls management", icon: "payment", module: "payrolls_management" },
-                            { label: "Lead's management", icon: "supervisor-account", module: "lead_management" },
-                            { label: "Social media marketing management", icon: "share", module: "social_media_marketing" },
-                            { label: "Ad-hoc reports management", icon: "assessment", module: "adhoc_reports" },
-                        ].map((item, idx) => (
-                            <TouchableOpacity
-                                key={idx}
-                                onPress={() => {
-                                    setSelectedModule(item.label);
-                                    handleToggleDrawer()
-                                }}
-                                style={styles.drawerItem}
-                            >
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <MaterialIcons
-                                        name={item.icon}
-                                        size={20}
-                                        color={theme.colors.primary}
-                                        style={{ marginRight: 10 }}
-                                    />
-                                    <Text style={{ color: theme.colors.primary, fontSize: 16, fontWeight: "600" }}>
-                                        {item.label}
-                                    </Text>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
+                        {menuItems.map((item, idx) => {
+                            const isActive = selectedModule === item.label;
+
+                            return (
+                                <TouchableOpacity
+                                    key={idx}
+                                    onPress={() => {
+                                        setSelectedModule(item.label);
+                                        handleToggleDrawer()
+                                    }}
+                                    style={[
+                                        styles.drawerItem,
+                                        isActive && {
+                                            backgroundColor: theme.colors.primary,
+                                            marginHorizontal: 10,
+                                            borderRadius: 10,
+                                        }
+                                    ]}
+                                >
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <MaterialIcons
+                                            name={item.icon}
+                                            size={20}
+                                            color={isActive ? theme.colors.surface : theme.colors.primary}
+                                            style={{ marginRight: 10 }}
+                                        />
+                                        <Text style={[
+                                            styles.drawerItemText,
+                                            {
+                                                color: isActive ? theme.colors.surface : theme.colors.onSurface,
+                                            }
+                                        ]}>
+                                            {item.label}
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            );
+                        })}
                     </View>
 
                     {/* Bottom Buttons */}
                     <View style={styles.bottomButtonsContainer}>
                         <TouchableOpacity
                             style={[styles.bottomButton,]}
-                            onPress={() => console.log('Settings pressed')}
+                            onPress={() => navigation.navigate("Settings")}
                         >
                             <MaterialIcons name="settings" size={30} color={theme.colors.primary} />
-
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -144,12 +165,9 @@ const DrawerNavigator = () => {
                             onPress={() => setShowDialog(true)}
                         >
                             <MaterialIcons name="logout" size={30} color={theme.colors.primary} />
-
                         </TouchableOpacity>
                     </View>
                 </SafeAreaView>
-
-
             </Animated.View>
 
             {/* Main content */}
@@ -159,14 +177,12 @@ const DrawerNavigator = () => {
                     transform: [{ translateX: contentTranslate }],
                     borderRadius: drawerOpen ? 15 : 0,
                     overflow: 'hidden',
-
                 }}
             >
                 <CommonHeader
                     title="Hi Vvek"
                     showBackButton={false}
                     onRightPress={handleToggleDrawer}
-                    onBack={() => console.log('Back pressed')}
                     rightIcon="account-circle"
                 />
                 <View style={{ flex: 1, }}>
@@ -175,20 +191,15 @@ const DrawerNavigator = () => {
                     ) : (
                         <View style={[styles.comingSoonContainer, {
                             backgroundColor: theme.colors.onPrimary,
-
                         }]}>
                             <Text style={[styles.comingSoonTitle, {
                                 color: theme.colors.primary,
-
                             }]}>{selectedModule}</Text>
                             <Text style={[styles.comingSoonSubtitle, {
                                 color: theme.colors.onSurface,
-
                             }]}>Coming Soon 🚀</Text>
                         </View>
-
                     )}
-
                 </View>
             </Animated.View>
 
@@ -209,9 +220,6 @@ const DrawerNavigator = () => {
                 onConfirm={handleLogOut}
                 onCancel={() => setShowDialog(false)}
             />
-
-
-
         </View >
     );
 };
@@ -250,7 +258,6 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 5,
     },
-
     companyName: {
         fontSize: 20,
         fontWeight: '700',
@@ -273,6 +280,12 @@ const styles = StyleSheet.create({
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderColor: '#ccc',
         paddingHorizontal: 20,
+        marginVertical: 2,
+    },
+    drawerItemText: {
+        fontSize: 16,
+        fontWeight: "600",
+        flex: 1,
     },
     comingSoonContainer: {
         flex: 1,
@@ -284,14 +297,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 10,
     },
-
     comingSoonTitle: {
         fontSize: 22,
         fontWeight: '700',
         textAlign: 'center',
         marginBottom: 10,
     },
-
     comingSoonSubtitle: {
         fontSize: 18,
         fontWeight: '500',
@@ -304,7 +315,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center"
     },
-
     bottomButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -313,14 +323,11 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginTop: 10,
     },
-
     bottomButtonText: {
         fontSize: 16,
         fontWeight: '600',
         marginLeft: 8,
     },
-
-
 });
 
 export default DrawerNavigator;
